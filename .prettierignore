@@ -1,0 +1,10 @@
+# 빌드·배포 산출물
+.next
+out
+coverage
+node_modules
+public
+
+# 번들·lock 파일
+*.lock
+*.min.js
