@@ -18,6 +18,7 @@ const eslintConfig = [
     rules: {
       // 정적 배포해서 Next.js 의 Image 태그 사용 안하기 때문에 규칙 off
       "@next/next/no-img-element": "off",
+      "@typescript-eslint/no-explicit-any": "off",
     },
     ignores: ["build/**", "public/**/*.{js,css}"],
   },
