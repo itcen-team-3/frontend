@@ -69,13 +69,13 @@ export function CareLogDetail({
       acc[activity.category].push(activity);
       return acc;
     },
-    {} as Record<string, CareActivity[]>
+    {} as Record<string, CareActivity[]>,
   );
 
   // 총 소요 시간 계산
   const totalDuration = activities.reduce(
     (sum, activity) => sum + activity.duration,
-    0
+    0,
   );
 
   // 시간을 시간:분 형식으로 변환
@@ -183,7 +183,7 @@ export function CareLogDetail({
                       ))}
                     </div>
                   </div>
-                )
+                ),
               )}
 
               <div className="flex justify-between items-center p-4 bg-primary/10 rounded-lg border-2 border-primary/20">

@@ -26,7 +26,7 @@ export function LargeButton({
       variant={variant}
       className={cn(
         "text-lg md:text-xl py-6 px-8 rounded-xl h-auto",
-        className
+        className,
       )}
       {...props}
     >

@@ -35,13 +35,13 @@ export function AttendanceForm({
   initialData,
 }: AttendanceFormProps) {
   const [date, setDate] = useState<Date | undefined>(
-    mode === "create" ? undefined : initialData?.date || new Date()
+    mode === "create" ? undefined : initialData?.date || new Date(),
   );
   const [time, setTime] = useState<string>(
-    mode === "create" ? "" : initialData?.time || ""
+    mode === "create" ? "" : initialData?.time || "",
   );
   const [reason, setReason] = useState<string>(
-    mode === "create" ? "" : initialData?.reason || ""
+    mode === "create" ? "" : initialData?.reason || "",
   );
 
   const title = type === "check-in" ? "출근 소명하기" : "퇴근 소명하기";
@@ -69,7 +69,7 @@ export function AttendanceForm({
                   variant="outline"
                   className={cn(
                     "w-full justify-start text-left text-lg font-normal h-14",
-                    !date && "text-muted-foreground"
+                    !date && "text-muted-foreground",
                   )}
                 >
                   <CalendarIcon className="mr-2 h-5 w-5" />

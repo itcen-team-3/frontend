@@ -24,7 +24,7 @@ export function StatusBadge({ status, text, className }: StatusBadgeProps) {
       className={cn(
         "text-base py-1 px-3 font-medium",
         statusStyles[status],
-        className
+        className,
       )}
     >
       {text}
