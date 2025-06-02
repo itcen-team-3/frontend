@@ -146,7 +146,7 @@ export function AdminScheduleOverview({
 }: AdminScheduleOverviewProps) {
   // const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(
-    startOfWeek(new Date(), { weekStartsOn: 1 })
+    startOfWeek(new Date(), { weekStartsOn: 1 }),
   );
   const [selectedEventDetails, setSelectedEventDetails] = useState<{
     caregiver: Caregiver;
@@ -176,7 +176,7 @@ export function AdminScheduleOverview({
       acc[dateStr].push(event);
       return acc;
     },
-    {} as Record<string, ScheduleEvent[]>
+    {} as Record<string, ScheduleEvent[]>,
   );
 
   // 이전 주로 이동
@@ -237,7 +237,7 @@ export function AdminScheduleOverview({
               {format(
                 endOfWeek(currentWeekStart, { weekStartsOn: 1 }),
                 "MM월 dd일",
-                { locale: ko }
+                { locale: ko },
               )}
             </CardTitle>
             <Button variant="outline" size="icon" onClick={goToNextWeek}>
@@ -254,7 +254,7 @@ export function AdminScheduleOverview({
                   className={cn(
                     "py-2 font-medium",
                     isToday(day) &&
-                      "bg-primary text-primary-foreground rounded-md"
+                      "bg-primary text-primary-foreground rounded-md",
                   )}
                 >
                   {format(day, "eee", { locale: ko })}
@@ -269,14 +269,14 @@ export function AdminScheduleOverview({
               <React.Fragment key={caregiver.id}>
                 {currentWeekDays.map((day, dayIndex) => {
                   const dayEvents = getEventsForDay(day).filter(
-                    (event) => event.caregiverId === caregiver.id
+                    (event) => event.caregiverId === caregiver.id,
                   );
                   return (
                     <div
                       key={`${caregiver.id}-${dayIndex}`}
                       className={cn(
                         "min-h-[80px] border rounded-md p-1 overflow-y-auto",
-                        dayIndex === 0 && "relative"
+                        dayIndex === 0 && "relative",
                       )}
                     >
                       {dayIndex === 0 && (
@@ -339,7 +339,7 @@ export function AdminScheduleOverview({
                     format(
                       selectedEventDetails.event.date,
                       "yyyy년 MM월 dd일 (eee)",
-                      { locale: ko }
+                      { locale: ko },
                     )}
                 </p>
               </div>
