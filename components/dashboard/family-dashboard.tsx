@@ -1,27 +1,27 @@
-"use client"
+"use client";
 
-import React from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PageContainer } from "@/components/ui/page-container"
-import { PageHeader } from "@/components/ui/page-header"
-import { Calendar } from "@/components/ui/calendar"
-import { Button } from "@/components/ui/button"
-import { StatusBadge } from "@/components/ui/status-badge"
-import { ClipboardList, User } from "lucide-react"
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { ClipboardList, User } from "lucide-react";
 
 interface CareLog {
-  id: string
-  date: string
-  caregiverName: string
-  activities: string[]
+  id: string;
+  date: string;
+  caregiverName: string;
+  activities: string[];
 }
 
 interface FamilyDashboardProps {
-  familyName: string
-  patientName: string
-  caregiverName: string
-  caregiverStatus: "working" | "scheduled" | "off"
-  careLogs: CareLog[]
+  familyName: string;
+  patientName: string;
+  caregiverName: string;
+  caregiverStatus: "working" | "scheduled" | "off";
+  careLogs: CareLog[];
 }
 
 export function FamilyDashboard({
@@ -44,17 +44,20 @@ export function FamilyDashboard({
     },
   ],
 }: FamilyDashboardProps) {
-  const [date, setDate] = React.useState<Date | undefined>(new Date())
+  const [date, setDate] = React.useState<Date | undefined>(new Date());
 
   const statusMap = {
     working: { label: "근무 중", status: "success" },
     scheduled: { label: "예정됨", status: "info" },
     off: { label: "근무 없음", status: "default" },
-  }
+  };
 
   return (
     <PageContainer>
-      <PageHeader title={`${familyName}님, 안녕하세요`} description={`${patientName}님의 돌봄 현황을 확인하세요`} />
+      <PageHeader
+        title={`${familyName}님, 안녕하세요`}
+        description={`${patientName}님의 돌봄 현황을 확인하세요`}
+      />
 
       <div className="grid gap-6">
         <Card className="card-shadow">
@@ -69,7 +72,9 @@ export function FamilyDashboard({
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-medium">{caregiverName} 요양보호사</h3>
+                <h3 className="text-lg font-medium">
+                  {caregiverName} 요양보호사
+                </h3>
                 <StatusBadge
                   status={statusMap[caregiverStatus].status as any}
                   text={statusMap[caregiverStatus].label}
@@ -87,7 +92,12 @@ export function FamilyDashboard({
               <CardTitle className="text-xl">돌봄 일정</CardTitle>
             </CardHeader>
             <CardContent>
-              <Calendar mode="single" selected={date} onSelect={setDate} className="rounded-md border" />
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                className="rounded-md border"
+              />
             </CardContent>
           </Card>
 
@@ -108,7 +118,9 @@ export function FamilyDashboard({
                     </div>
                     <p className="text-base text-muted-foreground">
                       {log.activities.slice(0, 2).join(", ")}
-                      {log.activities.length > 2 ? ` 외 ${log.activities.length - 2}개` : ""}
+                      {log.activities.length > 2
+                        ? ` 외 ${log.activities.length - 2}개`
+                        : ""}
                     </p>
                   </div>
                 ))}
@@ -118,5 +130,5 @@ export function FamilyDashboard({
         </div>
       </div>
     </PageContainer>
-  )
+  );
 }

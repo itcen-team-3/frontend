@@ -1,16 +1,16 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PageContainer } from "@/components/ui/page-container"
-import { PageHeader } from "@/components/ui/page-header"
-import { LargeButton } from "@/components/ui/large-button"
-import { StatusBadge } from "@/components/ui/status-badge"
-import { Clock, ClipboardList } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
+import { LargeButton } from "@/components/ui/large-button";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { Clock, ClipboardList } from "lucide-react";
 
 interface CaregiverDashboardProps {
-  caregiverName: string
-  patientName: string | null
-  workingHours: string | null
-  isWorkingDay: boolean
-  isCheckedIn: boolean
+  caregiverName: string;
+  patientName: string | null;
+  workingHours: string | null;
+  isWorkingDay: boolean;
+  isCheckedIn: boolean;
 }
 
 export function CaregiverDashboard({
@@ -24,7 +24,11 @@ export function CaregiverDashboard({
     <PageContainer>
       <PageHeader
         title={`${caregiverName}님, 안녕하세요`}
-        description={isWorkingDay ? `오늘은 ${patientName}님, ${workingHours} 근무입니다` : "오늘은 근무날이 아닙니다"}
+        description={
+          isWorkingDay
+            ? `오늘은 ${patientName}님, ${workingHours} 근무입니다`
+            : "오늘은 근무날이 아닙니다"
+        }
       />
 
       <div className="grid gap-6">
@@ -35,15 +39,24 @@ export function CaregiverDashboard({
           <CardContent>
             <div className="flex items-center justify-between mb-4">
               <div className="text-lg">현재 상태:</div>
-              <StatusBadge status={isCheckedIn ? "success" : "default"} text={isCheckedIn ? "근무 중" : "미출근"} />
+              <StatusBadge
+                status={isCheckedIn ? "success" : "default"}
+                text={isCheckedIn ? "근무 중" : "미출근"}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <LargeButton className="bg-green-600 hover:bg-green-700 text-white" disabled={isCheckedIn}>
+              <LargeButton
+                className="bg-green-600 hover:bg-green-700 text-white"
+                disabled={isCheckedIn}
+              >
                 <Clock className="mr-2 h-6 w-6" />
                 출근하기
               </LargeButton>
-              <LargeButton className="bg-red-600 hover:bg-red-700 text-white" disabled={!isCheckedIn}>
+              <LargeButton
+                className="bg-red-600 hover:bg-red-700 text-white"
+                disabled={!isCheckedIn}
+              >
                 <Clock className="mr-2 h-6 w-6" />
                 퇴근하기
               </LargeButton>
@@ -64,5 +77,5 @@ export function CaregiverDashboard({
         </Card>
       </div>
     </PageContainer>
-  )
+  );
 }
