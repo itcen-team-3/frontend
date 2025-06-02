@@ -1,0 +1,215 @@
+"use client";
+
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageContainer } from "@/components/ui/page-container";
+import { PageHeader } from "@/components/ui/page-header";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ClipboardList, Plus } from "lucide-react";
+import Link from "next/link";
+
+interface CareLog {
+  id: string;
+  date: string;
+  patientName: string;
+  caregiverName: string;
+  activities: string[];
+}
+
+interface CareLogListProps {
+  userRole: "caregiver" | "admin" | "family";
+  careLogs: CareLog[];
+}
+
+export function CareLogList({
+  userRole = "caregiver",
+  careLogs = [
+    {
+      id: "1",
+      date: "2025-05-21",
+      patientName: "이환자",
+      caregiverName: "김요양",
+      activities: ["식사도움", "목욕도움", "말벗·격려 및 위로"],
+    },
+    {
+      id: "2",
+      date: "2025-05-20",
+      patientName: "이환자",
+      caregiverName: "김요양",
+      activities: ["식사도움", "청소 및 주변정돈", "외출 시 동행"],
+    },
+    {
+      id: "3",
+      date: "2025-05-19",
+      patientName: "최환자",
+      caregiverName: "박요양",
+      activities: ["식사도움", "목욕도움", "인지자극활동"],
+    },
+  ],
+}: CareLogListProps) {
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [activeTab, setActiveTab] = useState<string>("all");
+
+  // 날짜 형식 변환 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      weekday: "long",
+    });
+  };
+
+  // 필터링된 로그
+  const filteredLogs = careLogs.filter((log) => {
+    if (activeTab === "all") return true;
+
+    // 날짜 필터링 (선택한 날짜와 일치하는 로그만)
+    if (date) {
+      const logDate = new Date(log.date);
+      const selectedDate = new Date(date);
+      return (
+        logDate.getFullYear() === selectedDate.getFullYear() &&
+        logDate.getMonth() === selectedDate.getMonth() &&
+        logDate.getDate() === selectedDate.getDate()
+      );
+    }
+
+    return true;
+  });
+
+  return (
+    <PageContainer>
+      <div className="flex justify-between items-center">
+        <PageHeader
+          title="돌봄 일지"
+          description="돌봄 일지를 확인하고 관리하세요"
+          className="mb-0"
+        />
+        {userRole === "caregiver" && (
+          <Link href="/caregiver/care-logs/new">
+            <Button size="lg" className="text-lg">
+              <Plus className="mr-2 h-5 w-5" />새 일지 작성
+            </Button>
+          </Link>
+        )}
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-3 mt-6">
+        <Card className="card-shadow md:col-span-1">
+          <CardHeader>
+            <CardTitle className="text-xl">날짜 선택</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={setDate}
+              className="rounded-md border"
+            />
+          </CardContent>
+        </Card>
+
+        <Card className="card-shadow md:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-xl">돌봄 일지 목록</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs
+              defaultValue="all"
+              className="w-full"
+              onValueChange={setActiveTab}
+            >
+              <TabsList className="mb-4">
+                <TabsTrigger value="all" className="text-base">
+                  전체
+                </TabsTrigger>
+                <TabsTrigger value="date" className="text-base">
+                  선택 날짜
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="all" className="mt-0">
+                <div className="space-y-4">
+                  {careLogs.length > 0 ? (
+                    careLogs.map((log) => (
+                      <Link
+                        href={`/caregiver/care-logs/${log.id}`}
+                        key={log.id}
+                      >
+                        <div className="p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+                          <div className="flex justify-between items-center mb-2">
+                            <h3 className="text-lg font-medium">
+                              {formatDate(log.date)}
+                            </h3>
+                            <ClipboardList className="h-5 w-5 text-muted-foreground" />
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <p className="text-base text-muted-foreground">
+                              {userRole === "family"
+                                ? log.caregiverName
+                                : log.patientName}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {log.activities.length}개 활동
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="text-center text-muted-foreground py-8">
+                      <p>돌봄 일지가 없습니다</p>
+                      <Link href="/caregiver/care-logs/new">
+                        <Button className="mt-4">첫 돌봄 일지 작성하기</Button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="date" className="mt-0">
+                <div className="space-y-4">
+                  {filteredLogs.length > 0 ? (
+                    filteredLogs.map((log) => (
+                      <Link
+                        href={`/caregiver/care-logs/${log.id}`}
+                        key={log.id}
+                      >
+                        <div className="p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+                          <div className="flex justify-between items-center mb-2">
+                            <h3 className="text-lg font-medium">
+                              {formatDate(log.date)}
+                            </h3>
+                            <ClipboardList className="h-5 w-5 text-muted-foreground" />
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <p className="text-base text-muted-foreground">
+                              {userRole === "family"
+                                ? log.caregiverName
+                                : log.patientName}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {log.activities.length}개 활동
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">
+                      선택한 날짜에 돌봄 일지가 없습니다
+                    </p>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+    </PageContainer>
+  );
+}
