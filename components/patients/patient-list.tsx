@@ -62,11 +62,11 @@ export function PatientList({
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
-    null
+    null,
   );
 
   const filteredPatients = patients.filter((patient) =>
-    patient.name.toLowerCase().includes(searchTerm.toLowerCase())
+    patient.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const handleDeleteClick = (id: string) => {
