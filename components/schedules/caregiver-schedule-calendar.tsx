@@ -80,7 +80,7 @@ export function CaregiverScheduleCalendar({
 }: CaregiverScheduleCalendarProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(
-    startOfWeek(new Date(), { weekStartsOn: 1 })
+    startOfWeek(new Date(), { weekStartsOn: 1 }),
   );
   const [activeView, setActiveView] = useState<string>("month");
 
@@ -88,7 +88,7 @@ export function CaregiverScheduleCalendar({
 
   // 선택된 날짜의 일정
   const selectedDateEvents = scheduleEvents.filter((event) =>
-    isSameDay(event.date, selectedDate)
+    isSameDay(event.date, selectedDate),
   );
 
   // 현재 주의 날짜들
@@ -99,7 +99,7 @@ export function CaregiverScheduleCalendar({
 
   // 현재 주의 일정
   const currentWeekEvents = scheduleEvents.filter((event) =>
-    currentWeekDays.some((day) => isSameDay(day, event.date))
+    currentWeekDays.some((day) => isSameDay(day, event.date)),
   );
 
   // 이전 주로 이동
@@ -153,7 +153,7 @@ export function CaregiverScheduleCalendar({
                   modifiers={{
                     hasEvent: (date) =>
                       scheduleEvents.some((event) =>
-                        isSameDay(event.date, date)
+                        isSameDay(event.date, date),
                       ),
                   }}
                   modifiersStyles={{
@@ -224,7 +224,7 @@ export function CaregiverScheduleCalendar({
                   {format(
                     endOfWeek(currentWeekStart, { weekStartsOn: 1 }),
                     "MM월 dd일",
-                    { locale: ko }
+                    { locale: ko },
                   )}
                 </CardTitle>
                 <Button variant="outline" size="icon" onClick={goToNextWeek}>
@@ -240,7 +240,7 @@ export function CaregiverScheduleCalendar({
                       className={cn(
                         "py-2 font-medium",
                         isSameDay(day, new Date()) &&
-                          "bg-primary text-primary-foreground rounded-md"
+                          "bg-primary text-primary-foreground rounded-md",
                       )}
                     >
                       {format(day, "eee", { locale: ko })}
