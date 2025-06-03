@@ -10,14 +10,29 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, ArrowLeft, Check, AlertCircle } from "lucide-react";
+import {
+  Camera,
+  ArrowLeft,
+  Check,
+  AlertCircle,
+  CalendarIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 interface FormData {
   name: string;
-  age: string;
+  birthDate: Date | undefined;
   phone: string;
   address: string;
   licenseNumber: string;
@@ -35,7 +50,7 @@ export function CaregiverRegistrationForm() {
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
-    age: "",
+    birthDate: undefined,
     phone: "",
     address: "",
     licenseNumber: "",
@@ -65,6 +80,20 @@ export function CaregiverRegistrationForm() {
     }
   };
 
+  const calculateAge = (birthDate: Date): number => {
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      return age - 1;
+    }
+    return age;
+  };
+
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
@@ -73,12 +102,12 @@ export function CaregiverRegistrationForm() {
       newErrors.name = "이름을 입력해주세요";
     }
 
-    if (!formData.age.trim()) {
-      newErrors.age = "나이를 입력해주세요";
+    if (!formData.birthDate) {
+      newErrors.birthDate = "생년월일을 선택해주세요";
     } else {
-      const age = Number.parseInt(formData.age);
-      if (isNaN(age) || age < 18 || age > 80) {
-        newErrors.age = "18세 이상 80세 이하로 입력해주세요";
+      const age = calculateAge(formData.birthDate);
+      if (age < 18 || age > 80) {
+        newErrors.birthDate = "18세 이상 80세 이하만 등록 가능합니다";
       }
     }
 
@@ -222,26 +251,63 @@ export function CaregiverRegistrationForm() {
                 )}
               </div>
 
-              {/* 나이 */}
+              {/* 생년월일 */}
               <div className="space-y-2">
-                <Label htmlFor="age" className="text-lg">
-                  나이 <span className="text-red-500">*</span>
+                <Label htmlFor="birthDate" className="text-lg">
+                  생년월일 <span className="text-red-500">*</span>
                 </Label>
-                <Input
-                  id="age"
-                  name="age"
-                  type="number"
-                  value={formData.age}
-                  onChange={handleInputChange}
-                  placeholder="나이를 입력하세요"
-                  className={`text-lg h-14 ${errors.age ? "border-red-500" : ""}`}
-                  min="18"
-                  max="80"
-                />
-                {errors.age && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="birthDate"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left text-lg font-normal h-14",
+                        !formData.birthDate && "text-muted-foreground",
+                        errors.birthDate ? "border-red-500" : "",
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-5 w-5" />
+                      {formData.birthDate
+                        ? format(formData.birthDate, "yyyy년 MM월 dd일", {
+                            locale: ko,
+                          })
+                        : "생년월일을 선택하세요"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={formData.birthDate}
+                      onSelect={(date) =>
+                        setFormData((prev) => ({ ...prev, birthDate: date }))
+                      }
+                      initialFocus
+                      captionLayout="dropdown"
+                      fromYear={1930}
+                      toYear={new Date().getFullYear()}
+                      classNames={{
+                        caption_label: "hidden",
+                        dropdown: "text-lg",
+                        caption:
+                          "flex justify-center pt-1 relative items-center",
+                        nav_button_previous: "absolute left-1",
+                        nav_button_next: "absolute right-1",
+                        dropdown_month: "w-full",
+                        dropdown_year: "w-full",
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+                {formData.birthDate && (
+                  <p className="text-sm text-muted-foreground">
+                    나이: {calculateAge(formData.birthDate)}세
+                  </p>
+                )}
+                {errors.birthDate && (
                   <div className="flex items-center text-red-500 text-sm">
                     <AlertCircle className="h-4 w-4 mr-1" />
-                    {errors.age}
+                    {errors.birthDate}
                   </div>
                 )}
               </div>
