@@ -4,6 +4,7 @@ export default function EditCaregiverPage() {
   // 실제 구현에서는 ID를 기반으로 데이터를 가져옵니다
   const mockData = {
     name: "김요양",
+    birthDate: undefined,
     age: "45",
     address: "서울시 강남구",
     phone: "010-1234-5678",

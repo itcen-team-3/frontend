@@ -10,15 +10,24 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, ArrowLeft, Check } from "lucide-react";
+import { Camera, ArrowLeft, Check, CalendarIcon } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
 
 interface CaregiverFormProps {
   mode: "create" | "edit";
   initialData?: {
     name: string;
-    age: string;
+    birthDate: Date | undefined;
     address: string;
     phone: string;
     bio: string;
@@ -32,7 +41,7 @@ export function CaregiverForm({
   mode = "create",
   initialData = {
     name: "",
-    age: "",
+    birthDate: undefined,
     address: "",
     phone: "",
     bio: "",
@@ -45,7 +54,7 @@ export function CaregiverForm({
     mode === "create"
       ? {
           name: "",
-          age: "",
+          birthDate: undefined,
           address: "",
           phone: "",
           bio: "",
@@ -81,8 +90,8 @@ export function CaregiverForm({
     if (!formData.name.trim()) {
       newErrors.name = "이름을 입력해주세요";
     }
-    if (!formData.age.trim()) {
-      newErrors.age = "나이를 입력해주세요";
+    if (!formData.birthDate) {
+      newErrors.birthDate = "생년월일을 입력해주세요";
     }
     if (!formData.phone.trim()) {
       newErrors.phone = "연락처를 입력해주세요";
@@ -132,6 +141,22 @@ export function CaregiverForm({
       ? "새로운 요양보호사를 등록합니다"
       : "요양보호사 정보를 수정합니다";
   const buttonText = mode === "create" ? "등록하기" : "수정하기";
+
+  const calculateAge = (birthDate: Date | undefined): number | null => {
+    if (!birthDate) return null;
+
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const month = today.getMonth() - birthDate.getMonth();
+
+    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    return age;
+  };
+
+  const age = calculateAge(formData.birthDate);
 
   return (
     <PageContainer>
@@ -208,22 +233,63 @@ export function CaregiverForm({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="age" className="text-lg">
-                  나이 <span className="text-red-500">*</span>
+                <Label htmlFor="birthDate" className="text-lg">
+                  생년월일 <span className="text-red-500">*</span>
                 </Label>
-                <Input
-                  id="age"
-                  name="age"
-                  type="number"
-                  value={formData.age}
-                  onChange={handleChange}
-                  placeholder="나이를 입력하세요"
-                  className={`text-lg h-14 ${errors.age ? "border-red-500" : ""}`}
-                  min="18"
-                  max="80"
-                />
-                {errors.age && (
-                  <p className="text-red-500 text-sm">{errors.age}</p>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="birthDate"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left text-lg font-normal h-14",
+                        !formData.birthDate && "text-muted-foreground",
+                        errors.birthDate ? "border-red-500" : "",
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-5 w-5" />
+                      {formData.birthDate
+                        ? format(formData.birthDate, "yyyy년 MM월 dd일", {
+                            locale: ko,
+                          })
+                        : "생년월일을 선택하세요"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={formData.birthDate}
+                      onSelect={(date) => {
+                        setFormData((prev) => ({ ...prev, birthDate: date }));
+                        if (errors.birthDate) {
+                          setErrors((prev) => ({
+                            ...prev,
+                            birthDate: "",
+                          }));
+                        }
+                      }}
+                      initialFocus
+                      captionLayout="dropdown"
+                      fromYear={1930}
+                      toYear={new Date().getFullYear()}
+                      classNames={{
+                        caption_label: "hidden",
+                        dropdown: "text-lg",
+                        caption:
+                          "flex justify-center pt-1 relative items-center",
+                        nav_button_previous: "absolute left-1",
+                        nav_button_next: "absolute right-1",
+                        dropdown_month: "w-full",
+                        dropdown_year: "w-full",
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+                {errors.birthDate && (
+                  <p className="text-red-500 text-sm">{errors.birthDate}</p>
+                )}
+                {age !== null && (
+                  <p className="text-sm text-muted-foreground">만 {age}세</p>
                 )}
               </div>
             </div>
