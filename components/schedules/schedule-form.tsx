@@ -53,6 +53,7 @@ interface ScheduleFormProps {
     endTime: string;
     days: string[];
     hourlyRate: string;
+    salaryType: string;
     isFamily: boolean;
   };
 }
@@ -78,6 +79,7 @@ export function ScheduleForm({
     endTime: "12:00",
     days: [],
     hourlyRate: "10000",
+    salaryType: "방문급여",
     isFamily: false,
   },
 }: ScheduleFormProps) {
@@ -261,7 +263,9 @@ export function ScheduleForm({
                     >
                       <CalendarIcon className="mr-2 h-5 w-5" />
                       {formData.startDate
-                        ? format(formData.startDate, "PPP", { locale: ko })
+                        ? format(formData.startDate, "yyyy년 MM월 dd일", {
+                            locale: ko,
+                          })
                         : "날짜를 선택하세요"}
                     </Button>
                   </PopoverTrigger>
@@ -274,6 +278,19 @@ export function ScheduleForm({
                         setFormData((prev) => ({ ...prev, startDate: date }))
                       }
                       initialFocus
+                      captionLayout="dropdown"
+                      fromYear={2020}
+                      toYear={2030}
+                      classNames={{
+                        caption_label: "hidden",
+                        dropdown: "text-lg",
+                        caption:
+                          "flex justify-center pt-1 relative items-center",
+                        nav_button_previous: "absolute left-1",
+                        nav_button_next: "absolute right-1",
+                        dropdown_month: "w-full",
+                        dropdown_year: "w-full",
+                      }}
                     />
                   </PopoverContent>
                 </Popover>
@@ -294,7 +311,9 @@ export function ScheduleForm({
                     >
                       <CalendarIcon className="mr-2 h-5 w-5" />
                       {formData.endDate
-                        ? format(formData.endDate, "PPP", { locale: ko })
+                        ? format(formData.endDate, "yyyy년 MM월 dd일", {
+                            locale: ko,
+                          })
                         : "날짜를 선택하세요"}
                     </Button>
                   </PopoverTrigger>
@@ -307,6 +326,19 @@ export function ScheduleForm({
                         setFormData((prev) => ({ ...prev, endDate: date }))
                       }
                       initialFocus
+                      captionLayout="dropdown"
+                      fromYear={2020}
+                      toYear={2030}
+                      classNames={{
+                        caption_label: "hidden",
+                        dropdown: "text-lg",
+                        caption:
+                          "flex justify-center pt-1 relative items-center",
+                        nav_button_previous: "absolute left-1",
+                        nav_button_next: "absolute right-1",
+                        dropdown_month: "w-full",
+                        dropdown_year: "w-full",
+                      }}
                     />
                   </PopoverContent>
                 </Popover>
@@ -363,6 +395,42 @@ export function ScheduleForm({
                   </div>
                 ))}
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="salaryType" className="text-lg">
+                급여종류
+              </Label>
+              <Select
+                value={formData.salaryType}
+                onValueChange={(value) =>
+                  handleSelectChange("salaryType", value)
+                }
+              >
+                <SelectTrigger className="text-lg h-14">
+                  <SelectValue placeholder="급여종류를 선택하세요" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="방문급여" className="text-lg">
+                    방문급여
+                  </SelectItem>
+                  <SelectItem value="방문목욕" className="text-lg">
+                    방문목욕
+                  </SelectItem>
+                  <SelectItem value="방문간호" className="text-lg">
+                    방문간호
+                  </SelectItem>
+                  <SelectItem value="단기보호" className="text-lg">
+                    단기보호
+                  </SelectItem>
+                  <SelectItem value="주야간보호급여" className="text-lg">
+                    주야간보호급여
+                  </SelectItem>
+                  <SelectItem value="가족요양급여" className="text-lg">
+                    가족요양급여
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
