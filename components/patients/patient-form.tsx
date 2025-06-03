@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, ArrowLeft, Check } from "lucide-react";
+import { Camera, ArrowLeft, Check, CalendarIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -20,16 +20,26 @@ import {
 } from "@/components/ui/select";
 import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
 
 interface PatientFormProps {
   mode: "create" | "edit";
   initialData?: {
     name: string;
-    age: string;
+    birthDate: Date | undefined;
     address: string;
     phone: string;
     medicalNotes: string;
     familyContact: string;
+    familyRelation: string;
     imageUrl: string;
     careGrade: string;
   };
@@ -39,11 +49,12 @@ export function PatientForm({
   mode = "create",
   initialData = {
     name: "",
-    age: "",
+    birthDate: undefined,
     address: "",
     phone: "",
     medicalNotes: "",
     familyContact: "",
+    familyRelation: "",
     imageUrl: "",
     careGrade: "",
   },
@@ -52,11 +63,12 @@ export function PatientForm({
     mode === "create"
       ? {
           name: "",
-          age: "",
+          birthDate: undefined,
           address: "",
           phone: "",
           medicalNotes: "",
           familyContact: "",
+          familyRelation: "",
           imageUrl: "",
           careGrade: "",
         }
@@ -96,14 +108,27 @@ export function PatientForm({
     }
   };
 
+  const handleDateChange = (date: Date | undefined) => {
+    setFormData((prev) => ({
+      ...prev,
+      birthDate: date,
+    }));
+    if (errors["birthDate"]) {
+      setErrors((prev) => ({
+        ...prev,
+        ["birthDate"]: "",
+      }));
+    }
+  };
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
       newErrors.name = "이름을 입력해주세요";
     }
-    if (!formData.age.trim()) {
-      newErrors.age = "나이를 입력해주세요";
+    if (!formData.birthDate) {
+      newErrors.birthDate = "생년월일을 입력해주세요";
     }
     if (!formData.phone.trim()) {
       newErrors.phone = "연락처를 입력해주세요";
@@ -116,6 +141,9 @@ export function PatientForm({
     }
     if (!formData.familyContact.trim()) {
       newErrors.familyContact = "가족 연락처를 입력해주세요";
+    }
+    if (!formData.familyRelation) {
+      newErrors.familyRelation = "가족 관계를 선택해주세요";
     }
 
     setErrors(newErrors);
@@ -153,6 +181,20 @@ export function PatientForm({
       ? "새로운 보호대상자를 등록합니다"
       : "보호대상자 정보를 수정합니다";
   const buttonText = mode === "create" ? "등록하기" : "수정하기";
+
+  const calculateAge = (birthDate: Date | undefined): number | null => {
+    if (!birthDate) return null;
+
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const month = today.getMonth() - birthDate.getMonth();
+
+    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    return age;
+  };
 
   return (
     <PageContainer>
@@ -229,22 +271,58 @@ export function PatientForm({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="age" className="text-lg">
-                  나이 <span className="text-red-500">*</span>
+                <Label htmlFor="birthDate" className="text-lg">
+                  생년월일 <span className="text-red-500">*</span>
                 </Label>
-                <Input
-                  id="age"
-                  name="age"
-                  type="number"
-                  value={formData.age}
-                  onChange={handleChange}
-                  placeholder="나이를 입력하세요"
-                  className={`text-lg h-14 ${errors.age ? "border-red-500" : ""}`}
-                  min="1"
-                  max="120"
-                />
-                {errors.age && (
-                  <p className="text-red-500 text-sm">{errors.age}</p>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="birthDate"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal text-lg h-14",
+                        !formData.birthDate && "text-muted-foreground",
+                        errors.birthDate ? "border-red-500" : "",
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-5 w-5" />
+                      {formData.birthDate
+                        ? format(formData.birthDate, "yyyy년 MM월 dd일", {
+                            locale: ko,
+                          })
+                        : "생년월일을 선택하세요"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={formData.birthDate}
+                      onSelect={handleDateChange}
+                      disabled={(date) => date > new Date()}
+                      initialFocus
+                      captionLayout="dropdown"
+                      fromYear={1900}
+                      toYear={new Date().getFullYear()}
+                      classNames={{
+                        caption_label: "hidden",
+                        dropdown: "text-lg",
+                        caption:
+                          "flex justify-center pt-1 relative items-center",
+                        nav_button_previous: "absolute left-1",
+                        nav_button_next: "absolute right-1",
+                        dropdown_month: "w-full",
+                        dropdown_year: "w-full",
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+                {formData.birthDate && (
+                  <p className="text-sm text-muted-foreground">
+                    나이: {calculateAge(formData.birthDate)}세
+                  </p>
+                )}
+                {errors.birthDate && (
+                  <p className="text-red-500 text-sm">{errors.birthDate}</p>
                 )}
               </div>
             </div>
@@ -314,21 +392,72 @@ export function PatientForm({
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="familyContact" className="text-lg">
-                가족 연락처 <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="familyContact"
-                name="familyContact"
-                value={formData.familyContact}
-                onChange={handleChange}
-                placeholder="010-0000-0000 (관계: 아들/딸/배우자 등)"
-                className={`text-lg h-14 ${errors.familyContact ? "border-red-500" : ""}`}
-              />
-              {errors.familyContact && (
-                <p className="text-red-500 text-sm">{errors.familyContact}</p>
-              )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="familyContact" className="text-lg">
+                  가족 연락처 <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="familyContact"
+                  name="familyContact"
+                  value={formData.familyContact}
+                  onChange={handleChange}
+                  placeholder="010-0000-0000"
+                  className={`text-lg h-14 ${errors.familyContact ? "border-red-500" : ""}`}
+                />
+                {errors.familyContact && (
+                  <p className="text-red-500 text-sm">{errors.familyContact}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="familyRelation" className="text-lg">
+                  가족 관계 <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={formData.familyRelation}
+                  onValueChange={(value) =>
+                    handleSelectChange("familyRelation", value)
+                  }
+                >
+                  <SelectTrigger
+                    className={`text-lg h-14 ${errors.familyRelation ? "border-red-500" : ""}`}
+                  >
+                    <SelectValue placeholder="가족 관계를 선택하세요" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="spouse" className="text-lg">
+                      배우자
+                    </SelectItem>
+                    <SelectItem value="son" className="text-lg">
+                      아들
+                    </SelectItem>
+                    <SelectItem value="daughter" className="text-lg">
+                      딸
+                    </SelectItem>
+                    <SelectItem value="father" className="text-lg">
+                      아버지
+                    </SelectItem>
+                    <SelectItem value="mother" className="text-lg">
+                      어머니
+                    </SelectItem>
+                    <SelectItem value="brother" className="text-lg">
+                      형제
+                    </SelectItem>
+                    <SelectItem value="sister" className="text-lg">
+                      자매
+                    </SelectItem>
+                    <SelectItem value="other" className="text-lg">
+                      기타
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.familyRelation && (
+                  <p className="text-red-500 text-sm">
+                    {errors.familyRelation}
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">

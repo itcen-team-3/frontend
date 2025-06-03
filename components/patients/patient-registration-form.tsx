@@ -10,7 +10,13 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, ArrowLeft, Check, AlertCircle } from "lucide-react";
+import {
+  Camera,
+  ArrowLeft,
+  Check,
+  AlertCircle,
+  CalendarIcon,
+} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -21,14 +27,24 @@ import {
 import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
 
 interface FormData {
   name: string;
-  age: string;
+  birthDate: Date | undefined;
   phone: string;
   address: string;
   careGrade: string;
   familyContact: string;
+  familyRelation: string;
   medicalNotes: string;
   imageUrl: string;
 }
@@ -42,11 +58,12 @@ export function PatientRegistrationForm() {
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
-    age: "",
+    birthDate: undefined,
     phone: "",
     address: "",
     careGrade: "",
     familyContact: "",
+    familyRelation: "",
     medicalNotes: "",
     imageUrl: "",
   });
@@ -95,13 +112,8 @@ export function PatientRegistrationForm() {
       newErrors.name = "이름을 입력해주세요";
     }
 
-    if (!formData.age.trim()) {
-      newErrors.age = "나이를 입력해주세요";
-    } else {
-      const age = Number.parseInt(formData.age);
-      if (isNaN(age) || age < 1 || age > 120) {
-        newErrors.age = "1세 이상 120세 이하로 입력해주세요";
-      }
+    if (!formData.birthDate) {
+      newErrors.birthDate = "생년월일을 선택해주세요";
     }
 
     if (!formData.phone.trim()) {
@@ -123,6 +135,10 @@ export function PatientRegistrationForm() {
 
     if (!formData.familyContact.trim()) {
       newErrors.familyContact = "가족 연락처를 입력해주세요";
+    }
+
+    if (!formData.familyRelation) {
+      newErrors.familyRelation = "가족 관계를 선택해주세요";
     }
 
     setErrors(newErrors);
@@ -177,6 +193,20 @@ export function PatientRegistrationForm() {
       default:
         return "";
     }
+  };
+
+  const calculateAge = (birthDate: Date | undefined): number | null => {
+    if (!birthDate) return null;
+
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const month = today.getMonth() - birthDate.getMonth();
+
+    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    return age;
   };
 
   return (
@@ -258,26 +288,63 @@ export function PatientRegistrationForm() {
                 )}
               </div>
 
-              {/* 나이 */}
+              {/* 생년월일 */}
               <div className="space-y-2">
-                <Label htmlFor="age" className="text-lg">
-                  나이 <span className="text-red-500">*</span>
+                <Label htmlFor="birthDate" className="text-lg">
+                  생년월일 <span className="text-red-500">*</span>
                 </Label>
-                <Input
-                  id="age"
-                  name="age"
-                  type="number"
-                  value={formData.age}
-                  onChange={handleInputChange}
-                  placeholder="나이를 입력하세요"
-                  className={`text-lg h-14 ${errors.age ? "border-red-500" : ""}`}
-                  min="1"
-                  max="120"
-                />
-                {errors.age && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="birthDate"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left text-lg font-normal h-14",
+                        !formData.birthDate && "text-muted-foreground",
+                        errors.birthDate ? "border-red-500" : "",
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-5 w-5" />
+                      {formData.birthDate
+                        ? format(formData.birthDate, "yyyy년 MM월 dd일", {
+                            locale: ko,
+                          })
+                        : "생년월일을 선택하세요"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={formData.birthDate}
+                      onSelect={(date) =>
+                        setFormData((prev) => ({ ...prev, birthDate: date }))
+                      }
+                      initialFocus
+                      captionLayout="dropdown"
+                      fromYear={1900}
+                      toYear={new Date().getFullYear()}
+                      classNames={{
+                        caption_label: "hidden",
+                        dropdown: "text-lg",
+                        caption:
+                          "flex justify-center pt-1 relative items-center",
+                        nav_button_previous: "absolute left-1",
+                        nav_button_next: "absolute right-1",
+                        dropdown_month: "w-full",
+                        dropdown_year: "w-full",
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+                {formData.birthDate && (
+                  <p className="text-sm text-muted-foreground">
+                    나이: {calculateAge(formData.birthDate)}세
+                  </p>
+                )}
+                {errors.birthDate && (
                   <div className="flex items-center text-red-500 text-sm">
                     <AlertCircle className="h-4 w-4 mr-1" />
-                    {errors.age}
+                    {errors.birthDate}
                   </div>
                 )}
               </div>
@@ -360,7 +427,57 @@ export function PatientRegistrationForm() {
               )}
             </div>
 
-            {/* 가족 연락처 */}
+            {/* 가족 관계 */}
+            <div className="space-y-2">
+              <Label htmlFor="familyRelation" className="text-lg">
+                가족 관계 <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={formData.familyRelation}
+                onValueChange={(value) =>
+                  handleSelectChange("familyRelation", value)
+                }
+              >
+                <SelectTrigger
+                  className={`text-lg h-14 ${errors.familyRelation ? "border-red-500" : ""}`}
+                >
+                  <SelectValue placeholder="가족 관계를 선택하세요" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="spouse" className="text-lg">
+                    배우자
+                  </SelectItem>
+                  <SelectItem value="son" className="text-lg">
+                    아들
+                  </SelectItem>
+                  <SelectItem value="daughter" className="text-lg">
+                    딸
+                  </SelectItem>
+                  <SelectItem value="father" className="text-lg">
+                    아버지
+                  </SelectItem>
+                  <SelectItem value="mother" className="text-lg">
+                    어머니
+                  </SelectItem>
+                  <SelectItem value="brother" className="text-lg">
+                    형제
+                  </SelectItem>
+                  <SelectItem value="sister" className="text-lg">
+                    자매
+                  </SelectItem>
+                  <SelectItem value="other" className="text-lg">
+                    기타
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.familyRelation && (
+                <div className="flex items-center text-red-500 text-sm">
+                  <AlertCircle className="h-4 w-4 mr-1" />
+                  {errors.familyRelation}
+                </div>
+              )}
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="familyContact" className="text-lg">
                 가족 연락처 <span className="text-red-500">*</span>
@@ -370,7 +487,7 @@ export function PatientRegistrationForm() {
                 name="familyContact"
                 value={formData.familyContact}
                 onChange={handleInputChange}
-                placeholder="010-0000-0000 (관계: 아들/딸/배우자 등)"
+                placeholder="010-0000-0000"
                 className={`text-lg h-14 ${errors.familyContact ? "border-red-500" : ""}`}
               />
               {errors.familyContact && (
@@ -379,9 +496,6 @@ export function PatientRegistrationForm() {
                   {errors.familyContact}
                 </div>
               )}
-              <p className="text-sm text-muted-foreground">
-                긴급 상황 시 연락할 가족의 연락처와 관계를 함께 입력해주세요.
-              </p>
             </div>
 
             {/* 주소 */}
@@ -434,7 +548,7 @@ export function PatientRegistrationForm() {
         </Card>
 
         {/* 등록 정보 요약 */}
-        {formData.name && formData.age && formData.careGrade && (
+        {formData.name && formData.birthDate && formData.careGrade && (
           <Card className="card-shadow bg-muted/30">
             <CardHeader>
               <CardTitle className="text-xl">등록 정보 요약</CardTitle>
@@ -447,7 +561,9 @@ export function PatientRegistrationForm() {
                 </div>
                 <div className="p-3 border rounded-lg bg-white">
                   <p className="text-sm text-muted-foreground">나이</p>
-                  <p className="text-lg font-medium">{formData.age}세</p>
+                  <p className="text-lg font-medium">
+                    {calculateAge(formData.birthDate)}세
+                  </p>
                 </div>
                 <div className="p-3 border rounded-lg bg-white">
                   <p className="text-sm text-muted-foreground">장기요양등급</p>
