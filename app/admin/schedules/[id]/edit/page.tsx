@@ -11,6 +11,7 @@ export default function EditSchedulePage() {
     endTime: "12:00",
     days: ["월", "수", "금"],
     hourlyRate: "12000",
+    salaryType: "방문급여",
     isFamily: false,
   };
 
