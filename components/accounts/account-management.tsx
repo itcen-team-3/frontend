@@ -82,12 +82,18 @@ export function AccountManagement({
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] =
     useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editAccount, setEditAccount] = useState({
+    id: "",
+    username: "",
+    role: "",
+    relatedId: "",
+  });
 
   // 새 계정 생성 폼 상태
   const [newAccount, setNewAccount] = useState({
     username: "",
     password: "",
-    name: "",
     role: "caregiver",
     relatedId: "",
   });
@@ -109,7 +115,8 @@ export function AccountManagement({
     // 역할 필터링
     const matchesRole = activeTab === "all" || account.role === activeTab;
 
-    return matchesSearch && matchesRole;
+    // admin 계정 제외
+    return matchesSearch && matchesRole && account.role !== "admin";
   });
 
   const handleDeleteClick = (id: string) => {
@@ -131,7 +138,6 @@ export function AccountManagement({
     setNewAccount({
       username: "",
       password: "",
-      name: "",
       role: "caregiver",
       relatedId: "",
     });
@@ -156,6 +162,16 @@ export function AccountManagement({
       confirmPassword: "",
     });
     setIsResetPasswordDialogOpen(true);
+  };
+
+  const handleEditClick = (account: Account) => {
+    setEditAccount({
+      id: account.id,
+      username: account.username,
+      role: account.role,
+      relatedId: account.relatedName || "",
+    });
+    setIsEditDialogOpen(true);
   };
 
   const getRoleName = (role: string) => {
@@ -288,20 +304,6 @@ export function AccountManagement({
                   className="text-lg h-12"
                 />
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-lg">
-                  이름
-                </Label>
-                <Input
-                  id="name"
-                  value={newAccount.name}
-                  onChange={(e) =>
-                    setNewAccount({ ...newAccount, name: e.target.value })
-                  }
-                  className="text-lg h-12"
-                />
-              </div>
             </div>
             <DialogFooter>
               <Button
@@ -324,7 +326,7 @@ export function AccountManagement({
         className="w-full mt-6"
         onValueChange={setActiveTab}
       >
-        <TabsList className="grid w-full grid-cols-4 mb-6">
+        <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="all" className="text-lg">
             전체
           </TabsTrigger>
@@ -333,9 +335,6 @@ export function AccountManagement({
           </TabsTrigger>
           <TabsTrigger value="family" className="text-lg">
             보호자
-          </TabsTrigger>
-          <TabsTrigger value="admin" className="text-lg">
-            관리자
           </TabsTrigger>
         </TabsList>
 
@@ -397,7 +396,11 @@ export function AccountManagement({
                             >
                               비밀번호 재설정
                             </Button>
-                            <Button variant="outline" size="icon">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => handleEditClick(account)}
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button
@@ -518,6 +521,111 @@ export function AccountManagement({
               onClick={handleDeleteConfirm}
             >
               삭제
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl">계정 수정</DialogTitle>
+            <DialogDescription className="text-lg">
+              계정 정보를 수정합니다.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-username" className="text-lg">
+                아이디
+              </Label>
+              <Input
+                id="edit-username"
+                value={editAccount.username}
+                onChange={(e) =>
+                  setEditAccount({ ...editAccount, username: e.target.value })
+                }
+                className="text-lg h-12"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-role" className="text-lg">
+                역할
+              </Label>
+              <Select
+                value={editAccount.role}
+                onValueChange={(value) =>
+                  setEditAccount({ ...editAccount, role: value })
+                }
+              >
+                <SelectTrigger className="text-lg h-12">
+                  <SelectValue placeholder="역할 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="caregiver" className="text-lg">
+                    요양보호사
+                  </SelectItem>
+                  <SelectItem value="family" className="text-lg">
+                    보호자
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-relatedId" className="text-lg">
+                {editAccount.role === "caregiver" ? "요양보호사" : "보호대상자"}
+              </Label>
+              <Select
+                value={editAccount.relatedId}
+                onValueChange={(value) =>
+                  setEditAccount({ ...editAccount, relatedId: value })
+                }
+              >
+                <SelectTrigger className="text-lg h-12">
+                  <SelectValue placeholder="선택하세요" />
+                </SelectTrigger>
+                <SelectContent>
+                  {editAccount.role === "caregiver" ? (
+                    <>
+                      <SelectItem value="c1" className="text-lg">
+                        김요양
+                      </SelectItem>
+                      <SelectItem value="c2" className="text-lg">
+                        박요양
+                      </SelectItem>
+                    </>
+                  ) : (
+                    <>
+                      <SelectItem value="p1" className="text-lg">
+                        이환자
+                      </SelectItem>
+                      <SelectItem value="p2" className="text-lg">
+                        최환자
+                      </SelectItem>
+                    </>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => setIsEditDialogOpen(false)}
+            >
+              취소
+            </Button>
+            <Button
+              size="lg"
+              onClick={() => {
+                console.log("Updating account:", editAccount);
+                setIsEditDialogOpen(false);
+              }}
+            >
+              수정
             </Button>
           </DialogFooter>
         </DialogContent>
