@@ -1,16 +1,14 @@
 // lib/http.ts
+import { ApiResponse } from "@/lib/types/api";
+
 type HttpMethod = "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
 
 interface HttpOptions<TBody = unknown> {
-  /** 쿼리 스트링 객체 → ?a=1&b=2 */
   query?: Record<string, string | number | boolean>;
-  /** fetch 옵션 추가 (cache, next.revalidate 등) */
   config?: RequestInit & { next?: NextFetchRequestConfig };
-  /** POST·PATCH·PUT·DELETE 본문 */
   body?: TBody;
 }
 
-// TODO : api url 확정되면 수정
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "https://api.example.com";
 
 function buildUrl(path: string, query?: HttpOptions["query"]) {
@@ -23,28 +21,22 @@ function buildUrl(path: string, query?: HttpOptions["query"]) {
   return url.toString();
 }
 
-export async function http<TResponse = unknown, TBody = unknown>(
+export async function http<T = unknown, B = unknown>(
   method: HttpMethod,
   path: string,
-  { query, body, config }: HttpOptions<TBody> = {}
-): Promise<TResponse> {
+  { query, body, config }: HttpOptions<B> = {}
+): Promise<ApiResponse<T>> {
   const res = await fetch(buildUrl(path, query), {
     method,
     headers: { "Content-Type": "application/json" },
-    // Next.js 전용 캐시 옵션도 그대로 전달 가능
     ...config,
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  if (!res.ok) {
-    // 에러 응답 JSON을 그대로 throw 하면 페이지·토스트에서 처리하기 편함
-    const error = await res.json().catch(() => ({}));
-    throw { status: res.status, ...error };
-  }
+  const json = await res.json().catch(() => ({}));
 
-  // 204 No Content 대비
-  if (res.status === 204) return {} as TResponse;
-  return res.json() as Promise<TResponse>;
+  // API 자체가 code/message/data 구조를 항상 보장한다는 전제 하
+  return json as ApiResponse<T>;
 }
 
 /* 편의 메소드 */
