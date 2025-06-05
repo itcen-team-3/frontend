@@ -30,4 +30,20 @@ interface SignUpRequest {
   phoneNumber: string;
 }
 
-export { type SignInRequest, type SignInResponse, type SignUpRequest };
+// refresh-token
+interface RefreshTokenRequest {
+  refreshToken: string;
+}
+
+interface RefreshTokenResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export {
+  type SignInRequest,
+  type SignInResponse,
+  type SignUpRequest,
+  type RefreshTokenRequest,
+  type RefreshTokenResponse,
+};
