@@ -9,6 +9,12 @@ interface HttpOptions<TBody = unknown> {
   body?: TBody;
 }
 
+interface HttpFormOptions {
+  query?: Record<string, string | number | boolean>;
+  config?: RequestInit & { next?: NextFetchRequestConfig };
+  body?: FormData;
+}
+
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8080/api/v1/";
 
@@ -47,6 +53,26 @@ export async function http<T = unknown, B = unknown>(
   return json as ApiResponse<T>;
 }
 
+export async function http_form<T = unknown>(
+  method: HttpMethod,
+  path: string,
+  { query, body, config }: HttpFormOptions = {}
+): Promise<ApiResponse<T>> {
+  const res = await fetch(buildUrl(path, query), {
+    method,
+    ...config,
+    body,
+  });
+
+  const json = await res.json().catch(() => ({}));
+
+  if (json.code >= 400) {
+    throw new Error(json.message);
+  }
+
+  return json as ApiResponse<T>;
+}
+
 /* 편의 메소드 */
 export const api = {
   get: <T>(p: string, o?: HttpOptions) => http<T>("GET", p, o),
@@ -54,4 +80,8 @@ export const api = {
   patch: <T, B>(p: string, o?: HttpOptions<B>) => http<T, B>("PATCH", p, o),
   put: <T, B>(p: string, o?: HttpOptions<B>) => http<T, B>("PUT", p, o),
   del: <T>(p: string, o?: HttpOptions) => http<T>("DELETE", p, o),
+  post_form: <T>(p: string, o?: HttpFormOptions) => http_form<T>("POST", p, o),
+  patch_form: <T>(p: string, o?: HttpFormOptions) =>
+    http_form<T>("PATCH", p, o),
+  put_form: <T>(p: string, o?: HttpFormOptions) => http_form<T>("PUT", p, o),
 };
