@@ -36,9 +36,14 @@ export async function http<T = unknown, B = unknown>(
   path: string,
   { query, body, config }: HttpOptions<B> = {}
 ): Promise<ApiResponse<T>> {
+  const accessToken = localStorage.getItem("access-token");
+
   const res = await fetch(buildUrl(path, query), {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: accessToken ? `Bearer ${accessToken}` : "",
+    },
     ...config,
     body: body ? JSON.stringify(body) : undefined,
   });
@@ -58,8 +63,13 @@ export async function http_form<T = unknown>(
   path: string,
   { query, body, config }: HttpFormOptions = {}
 ): Promise<ApiResponse<T>> {
+  const accessToken = localStorage.getItem("access-token");
+
   const res = await fetch(buildUrl(path, query), {
     method,
+    headers: {
+      Authorization: accessToken ? `Bearer ${accessToken}` : "",
+    },
     ...config,
     body,
   });
