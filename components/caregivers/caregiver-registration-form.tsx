@@ -1,7 +1,9 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { CaregiverInfoRequest } from "@/lib/types/member";
+
+import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
@@ -18,8 +20,7 @@ import {
   CalendarIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useRouter } from "next/navigation";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Popover,
   PopoverContent,
@@ -29,41 +30,47 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { ErrorMessage } from "@/lib/types/api";
+import Loading from "../ui/loading-page";
 
-interface FormData {
-  name: string;
-  birthDate: Date | undefined;
-  phone: string;
-  address: string;
-  licenseNumber: string;
-  experience: string;
-  bio: string;
-  imageUrl: string;
+interface CaregiverRegistrationFormProps {
+  isLoading: boolean;
+  error: ErrorMessage;
+  onClickCreateCaregiverButton: (args: CaregiverInfoRequest) => void;
 }
 
 interface FormErrors {
   [key: string]: string;
 }
 
-export function CaregiverRegistrationForm() {
-  const router = useRouter();
-
-  const [formData, setFormData] = useState<FormData>({
+export function CaregiverRegistrationForm({
+  isLoading,
+  error,
+  onClickCreateCaregiverButton,
+}: CaregiverRegistrationFormProps) {
+  const [formData, setFormData] = useState<CaregiverInfoRequest>({
     name: "",
     birthDate: undefined,
-    phone: "",
+    phoneNumber: "",
     address: "",
-    licenseNumber: "",
-    experience: "",
-    bio: "",
-    imageUrl: "",
+    certificateNumber: "",
+    career: "",
+    description: "",
+    profileImageUrl: null,
+    profileImage: null,
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -111,12 +118,12 @@ export function CaregiverRegistrationForm() {
       }
     }
 
-    if (!formData.phone.trim()) {
-      newErrors.phone = "연락처를 입력해주세요";
+    if (!formData.phoneNumber.trim()) {
+      newErrors.phoneNumber = "연락처를 입력해주세요";
     } else {
       const phoneRegex = /^010-\d{4}-\d{4}$/;
-      if (!phoneRegex.test(formData.phone)) {
-        newErrors.phone = "010-0000-0000 형식으로 입력해주세요";
+      if (!phoneRegex.test(formData.phoneNumber)) {
+        newErrors.phoneNumber = "010-0000-0000 형식으로 입력해주세요";
       }
     }
 
@@ -124,16 +131,16 @@ export function CaregiverRegistrationForm() {
       newErrors.address = "주소를 입력해주세요";
     }
 
-    if (!formData.licenseNumber.trim()) {
-      newErrors.licenseNumber = "요양보호사 자격증 번호를 입력해주세요";
+    if (!formData.certificateNumber.trim()) {
+      newErrors.certificateNumber = "요양보호사 자격증 번호를 입력해주세요";
     }
 
-    if (!formData.experience.trim()) {
-      newErrors.experience = "경력을 입력해주세요";
+    if (!formData.career.trim()) {
+      newErrors.career = "경력을 입력해주세요";
     } else {
-      const experience = Number.parseInt(formData.experience);
-      if (isNaN(experience) || experience < 0 || experience > 50) {
-        newErrors.experience = "0년 이상 50년 이하로 입력해주세요";
+      const career = Number.parseInt(formData.career);
+      if (isNaN(career) || career < 0 || career > 50) {
+        newErrors.career = "0년 이상 50년 이하로 입력해주세요";
       }
     }
 
@@ -150,27 +157,34 @@ export function CaregiverRegistrationForm() {
 
     setIsSubmitting(true);
 
-    try {
-      // 실제 구현에서는 API 호출
-      console.log("요양보호사 등록 데이터:", formData);
-
-      // 시뮬레이션을 위한 지연
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      alert("요양보호사가 성공적으로 등록되었습니다!");
-      router.push("/admin/caregivers");
-    } catch (error) {
-      console.error("등록 실패:", error);
-      alert("등록에 실패했습니다. 다시 시도해주세요.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    const fileInput = fileInputRef.current;
+    const data = {
+      ...formData,
+      profileImage: fileInput?.files?.[0] ? fileInput.files[0] : null,
+    };
+    onClickCreateCaregiverButton(data);
   };
 
   const handleImageUpload = () => {
-    // 실제 구현에서는 파일 업로드 처리
-    console.log("이미지 업로드");
+    if (!fileInputRef.current) return;
+    fileInputRef.current.click();
   };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setFormData((prev) => ({ ...prev, profileImageUrl: url }));
+    }
+  };
+
+  const errorBlock =
+    error && error.code >= 400 ? (
+      <Alert variant="destructive" className="mb-4">
+        <AlertTitle>요양보호사 등록 실패</AlertTitle>
+        <AlertDescription role="alert">{error.message}</AlertDescription>
+      </Alert>
+    ) : null;
 
   return (
     <PageContainer>
@@ -208,7 +222,7 @@ export function CaregiverRegistrationForm() {
                 <Avatar className="w-32 h-32">
                   <AvatarImage
                     src={
-                      formData.imageUrl ||
+                      formData.profileImageUrl ||
                       "/placeholder.svg?height=128&width=128&query=person"
                     }
                     alt="프로필 이미지"
@@ -226,6 +240,13 @@ export function CaregiverRegistrationForm() {
                 >
                   <Camera className="h-5 w-5" />
                 </Button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
               </div>
             </div>
 
@@ -264,7 +285,7 @@ export function CaregiverRegistrationForm() {
                       className={cn(
                         "w-full justify-start text-left text-lg font-normal h-14",
                         !formData.birthDate && "text-muted-foreground",
-                        errors.birthDate ? "border-red-500" : "",
+                        errors.birthDate ? "border-red-500" : ""
                       )}
                     >
                       <CalendarIcon className="mr-2 h-5 w-5" />
@@ -315,21 +336,21 @@ export function CaregiverRegistrationForm() {
 
             {/* 연락처 */}
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-lg">
+              <Label htmlFor="phoneNumber" className="text-lg">
                 연락처 <span className="text-red-500">*</span>
               </Label>
               <Input
-                id="phone"
-                name="phone"
-                value={formData.phone}
+                id="phoneNumber"
+                name="phoneNumber"
+                value={formData.phoneNumber}
                 onChange={handleInputChange}
                 placeholder="010-0000-0000"
-                className={`text-lg h-14 ${errors.phone ? "border-red-500" : ""}`}
+                className={`text-lg h-14 ${errors.phoneNumber ? "border-red-500" : ""}`}
               />
-              {errors.phone && (
+              {errors.phoneNumber && (
                 <div className="flex items-center text-red-500 text-sm">
                   <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.phone}
+                  {errors.phoneNumber}
                 </div>
               )}
             </div>
@@ -365,45 +386,45 @@ export function CaregiverRegistrationForm() {
           <CardContent className="space-y-6">
             {/* 자격증 번호 */}
             <div className="space-y-2">
-              <Label htmlFor="licenseNumber" className="text-lg">
+              <Label htmlFor="certificateNumber" className="text-lg">
                 요양보호사 자격증 번호 <span className="text-red-500">*</span>
               </Label>
               <Input
-                id="licenseNumber"
-                name="licenseNumber"
-                value={formData.licenseNumber}
+                id="certificateNumber"
+                name="certificateNumber"
+                value={formData.certificateNumber}
                 onChange={handleInputChange}
                 placeholder="LC-2020-001234"
-                className={`text-lg h-14 ${errors.licenseNumber ? "border-red-500" : ""}`}
+                className={`text-lg h-14 ${errors.certificateNumber ? "border-red-500" : ""}`}
               />
-              {errors.licenseNumber && (
+              {errors.certificateNumber && (
                 <div className="flex items-center text-red-500 text-sm">
                   <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.licenseNumber}
+                  {errors.certificateNumber}
                 </div>
               )}
             </div>
 
             {/* 경력 */}
             <div className="space-y-2">
-              <Label htmlFor="experience" className="text-lg">
+              <Label htmlFor="career" className="text-lg">
                 경력 (년) <span className="text-red-500">*</span>
               </Label>
               <Input
-                id="experience"
-                name="experience"
+                id="career"
+                name="career"
                 type="number"
-                value={formData.experience}
+                value={formData.career}
                 onChange={handleInputChange}
                 placeholder="경력을 년 단위로 입력하세요"
-                className={`text-lg h-14 ${errors.experience ? "border-red-500" : ""}`}
+                className={`text-lg h-14 ${errors.career ? "border-red-500" : ""}`}
                 min="0"
                 max="50"
               />
-              {errors.experience && (
+              {errors.career && (
                 <div className="flex items-center text-red-500 text-sm">
                   <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.experience}
+                  {errors.career}
                 </div>
               )}
               <p className="text-sm text-muted-foreground">
@@ -420,13 +441,13 @@ export function CaregiverRegistrationForm() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="bio" className="text-lg">
+              <Label htmlFor="description" className="text-lg">
                 자기소개
               </Label>
               <Textarea
-                id="bio"
-                name="bio"
-                value={formData.bio}
+                id="description"
+                name="description"
+                value={formData.description}
                 onChange={handleInputChange}
                 placeholder="간단한 자기소개와 요양보호사로서의 경험이나 철학을 입력해주세요"
                 className="min-h-[120px] text-lg"
@@ -437,6 +458,8 @@ export function CaregiverRegistrationForm() {
             </div>
           </CardContent>
         </Card>
+
+        {errorBlock}
 
         {/* 제출 버튼 */}
         <div className="flex justify-end space-x-4 pt-4">
