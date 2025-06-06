@@ -56,8 +56,8 @@ export function CaregiverRegistrationForm({
     certificateNumber: "",
     career: "",
     description: "",
-    profileImageUrl: null,
     profileImage: null,
+    profileImageFile: null,
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -160,7 +160,7 @@ export function CaregiverRegistrationForm({
     const fileInput = fileInputRef.current;
     const data = {
       ...formData,
-      profileImage: fileInput?.files?.[0] ? fileInput.files[0] : null,
+      profileImageFile: fileInput?.files?.[0] ? fileInput.files[0] : null,
     };
     onClickCreateCaregiverButton(data);
   };
@@ -174,7 +174,7 @@ export function CaregiverRegistrationForm({
     const file = e.target.files?.[0];
     if (file) {
       const url = URL.createObjectURL(file);
-      setFormData((prev) => ({ ...prev, profileImageUrl: url }));
+      setFormData((prev) => ({ ...prev, profileImage: url }));
     }
   };
 
@@ -222,7 +222,7 @@ export function CaregiverRegistrationForm({
                 <Avatar className="w-32 h-32">
                   <AvatarImage
                     src={
-                      formData.profileImageUrl ||
+                      formData.profileImage ||
                       "/placeholder.svg?height=128&width=128&query=person"
                     }
                     alt="프로필 이미지"

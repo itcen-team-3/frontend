@@ -32,8 +32,8 @@ export const useCreateCaregiver = () => {
       formData.append("career", data.career);
       formData.append("description", data.description);
 
-      if (data.profileImage) {
-        formData.append("profileImage", data.profileImage);
+      if (data.profileImageFile) {
+        formData.append("profileImage", data.profileImageFile);
       }
 
       const res = await api.post_form("/member/caregiver", {

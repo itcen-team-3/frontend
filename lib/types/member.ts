@@ -49,8 +49,8 @@ interface CaregiverInfoRequest {
   certificateNumber: string;
   career: string;
   description: string;
-  profileImageUrl: string | null;
-  profileImage?: File | null;
+  profileImage: string | null;
+  profileImageFile?: File | null;
 }
 
 // caregiver list
