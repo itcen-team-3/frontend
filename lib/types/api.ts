@@ -6,12 +6,17 @@ interface ApiSuccess<T = unknown> {
 }
 
 /* 실패 케이스 (4xx · 5xx) */
-interface ApiFailure<E = string> {
-  code: 400 | 401 | 403 | 404 | 500;
+// interface ApiFailure<E = string> {
+//   code: 400 | 401 | 403 | 404 | 500;
+//   message: string;
+//   data: E;
+// }
+
+// type ApiResponse<T = unknown, E = string> = ApiSuccess<T> | ApiFailure<E>;
+
+interface ErrorMessage {
+  code: number;
   message: string;
-  data: E;
 }
 
-type ApiResponse<T = unknown, E = string> = ApiSuccess<T> | ApiFailure<E>;
-
-export { type ApiResponse };
+export { type ApiSuccess as ApiResponse, type ErrorMessage };

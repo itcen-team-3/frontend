@@ -9,10 +9,14 @@ interface HttpOptions<TBody = unknown> {
   body?: TBody;
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "https://api.example.com";
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8080/api/v1/";
 
 function buildUrl(path: string, query?: HttpOptions["query"]) {
-  const url = new URL(path, API_BASE);
+  const cleanPath = path.replace(/^\/+/, "");
+
+  const url = new URL(cleanPath, API_BASE);
+
   if (query) {
     Object.entries(query).forEach(([k, v]) =>
       url.searchParams.append(k, String(v))
@@ -34,6 +38,10 @@ export async function http<T = unknown, B = unknown>(
   });
 
   const json = await res.json().catch(() => ({}));
+
+  if (json.code >= 400) {
+    throw new Error(json.message);
+  }
 
   // API 자체가 code/message/data 구조를 항상 보장한다는 전제 하
   return json as ApiResponse<T>;
