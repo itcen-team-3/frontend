@@ -17,59 +17,39 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-interface Caregiver {
-  id: string;
-  name: string;
-  age: number;
-  address: string;
-  phone: string;
-  imageUrl?: string;
-}
+import { ErrorMessage } from "@/lib/types/api";
+import { CaregiverListItem } from "@/lib/types/member";
+import Loading from "../ui/loading-page";
 
 interface CaregiverListProps {
-  caregivers: Caregiver[];
+  isLoading: boolean;
+  error: ErrorMessage;
+  onClickSearchButton: (args: string) => void;
+  content: CaregiverListItem[];
+  first: boolean;
+  last: boolean;
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
 }
 
 export function CaregiverList({
-  caregivers = [
-    {
-      id: "1",
-      name: "김요양",
-      age: 45,
-      address: "서울시 강남구",
-      phone: "010-1234-5678",
-      imageUrl: "/diverse-woman-portrait.png",
-    },
-    {
-      id: "2",
-      name: "박요양",
-      age: 52,
-      address: "서울시 서초구",
-      phone: "010-2345-6789",
-      imageUrl: "/thoughtful-man.png",
-    },
-    {
-      id: "3",
-      name: "정요양",
-      age: 48,
-      address: "서울시 송파구",
-      phone: "010-3456-7890",
-      imageUrl: "/diverse-woman-portrait.png",
-    },
-  ],
+  isLoading,
+  onClickSearchButton,
+  content,
 }: CaregiverListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedCaregiverId, setSelectedCaregiverId] = useState<string | null>(
-    null,
+  const [selectedCaregiverId, setSelectedCaregiverId] = useState<number | null>(
+    null
   );
 
-  const filteredCaregivers = caregivers.filter((caregiver) =>
-    caregiver.name.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  if (isLoading) {
+    return <Loading />;
+  }
 
-  const handleDeleteClick = (id: string) => {
+  const handleDeleteClick = (id: number) => {
     setSelectedCaregiverId(id);
     setDeleteDialogOpen(true);
   };
@@ -100,28 +80,37 @@ export function CaregiverList({
           <div className="flex justify-between items-center">
             <CardTitle className="text-xl">요양보호사 목록</CardTitle>
             <div className="relative w-64">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+              <Search
+                className="absolute left-3 top-3 h-5 w-5 text-muted-foreground"
+                onClick={() => onClickSearchButton(searchTerm)}
+              />
               <Input
                 placeholder="이름으로 검색"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 h-12 text-lg"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    onClickSearchButton(searchTerm);
+                  }
+                }}
               />
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {filteredCaregivers.length > 0 ? (
-              filteredCaregivers.map((caregiver) => (
+            {content && content.length > 0 ? (
+              content.map((caregiver) => (
                 <div
-                  key={caregiver.id}
+                  key={caregiver.caregiverId}
                   className="flex items-center justify-between p-4 border rounded-lg"
                 >
                   <div className="flex items-center gap-4">
                     <Avatar>
+                      {/* TODO : caregiver.imageUrl 추가 */}
                       <AvatarImage
-                        src={caregiver.imageUrl || "/placeholder.svg"}
+                        src={"/placeholder.svg"}
                         alt={caregiver.name}
                       />
                       <AvatarFallback>{caregiver.name[0]}</AvatarFallback>
@@ -129,17 +118,19 @@ export function CaregiverList({
                     <div>
                       <h3 className="text-lg font-medium">{caregiver.name}</h3>
                       <p className="text-sm text-muted-foreground">
-                        {caregiver.phone}
+                        {caregiver.phoneNumber}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Link href={`/admin/caregivers/${caregiver.id}`}>
+                    <Link href={`/admin/caregivers/${caregiver.caregiverId}`}>
                       <Button variant="outline" size="icon">
                         <User className="h-5 w-5" />
                       </Button>
                     </Link>
-                    <Link href={`/admin/caregivers/${caregiver.id}/edit`}>
+                    <Link
+                      href={`/admin/caregivers/${caregiver.caregiverId}/edit`}
+                    >
                       <Button variant="outline" size="icon">
                         <Edit className="h-5 w-5" />
                       </Button>
@@ -147,7 +138,7 @@ export function CaregiverList({
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => handleDeleteClick(caregiver.id)}
+                      onClick={() => handleDeleteClick(caregiver.caregiverId)}
                     >
                       <Trash2 className="h-5 w-5" />
                     </Button>
