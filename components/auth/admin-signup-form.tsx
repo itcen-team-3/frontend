@@ -24,7 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import Loading from "../ui/loading-page";
 import { useRouter } from "next/navigation";
 
-interface LoginFormProps {
+interface SignupFormProps {
   isLoading: boolean;
   error: ErrorMessage;
   onClickSignUpButton: (args: SignUpRequest) => void;
@@ -38,7 +38,7 @@ export function AdminSignupForm({
   isLoading,
   error,
   onClickSignUpButton,
-}: LoginFormProps) {
+}: SignupFormProps) {
   const router = useRouter();
 
   const [formData, setFormData] = useState<SignUpRequest>({
