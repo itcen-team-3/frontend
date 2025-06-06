@@ -1,6 +1,8 @@
 "use client";
 
 import type React from "react";
+import type { SignUpRequest } from "@/lib/types/member";
+import type { ErrorMessage } from "@/lib/types/api";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -17,39 +19,41 @@ import { Label } from "@/components/ui/label";
 import { EyeIcon, EyeOffIcon, Upload, AlertCircle, Check } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
+import Loading from "../ui/loading-page";
 import { useRouter } from "next/navigation";
 
-interface FormData {
-  username: string;
-  password: string;
-  confirmPassword: string;
-  facilityName: string;
-  representativeName: string;
-  phone: string;
-  email: string;
-  address: string;
-  businessRegistration: File | null;
+interface LoginFormProps {
+  isLoading: boolean;
+  error: ErrorMessage;
+  onClickSignUpButton: (args: SignUpRequest) => void;
 }
 
 interface FormErrors {
   [key: string]: string;
 }
 
-export function AdminSignupForm() {
+export function AdminSignupForm({
+  isLoading,
+  error,
+  onClickSignUpButton,
+}: LoginFormProps) {
   const router = useRouter();
 
-  const [formData, setFormData] = useState<FormData>({
-    username: "",
-    password: "",
-    confirmPassword: "",
-    facilityName: "",
+  const [formData, setFormData] = useState<SignUpRequest>({
+    loginId: "",
+    loginPw: "",
+    loginPwConfirm: "",
     representativeName: "",
-    phone: "",
+    birthDate: "",
+    companyName: "",
+    companyAddress: "",
     email: "",
-    address: "",
-    businessRegistration: null,
+    businessRegistrationFile: null,
+    businessRegistrationNumber: "",
+    openingDate: "",
+    phoneNumber: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -57,12 +61,16 @@ export function AdminSignupForm() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registrationPreview, setRegistrationPreview] = useState<string | null>(
-    null,
+    null
   );
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -81,27 +89,17 @@ export function AdminSignupForm() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
-
     if (file) {
-      setFormData((prev) => ({
+      setFormData((prev: SignUpRequest) => ({
         ...prev,
-        businessRegistration: file,
+        businessRegistrationFile: file,
       }));
 
-      // 이미지 미리보기 생성
       const reader = new FileReader();
       reader.onload = () => {
         setRegistrationPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
-
-      // 에러 메시지 제거
-      if (errors.businessRegistration) {
-        setErrors((prev) => ({
-          ...prev,
-          businessRegistration: "",
-        }));
-      }
     }
   };
 
@@ -109,29 +107,34 @@ export function AdminSignupForm() {
     const newErrors: FormErrors = {};
 
     // 아이디 검증
-    if (!formData.username.trim()) {
-      newErrors.username = "아이디를 입력해주세요";
-    } else if (formData.username.length < 4) {
-      newErrors.username = "아이디는 4자 이상이어야 합니다";
+    if (!formData.loginId.trim()) {
+      newErrors.loginId = "아이디를 입력해주세요";
+    } else if (formData.loginId.length < 4) {
+      newErrors.loginId = "아이디는 4자 이상이어야 합니다";
     }
 
     // 비밀번호 검증
-    if (!formData.password) {
-      newErrors.password = "비밀번호를 입력해주세요";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "비밀번호는 8자 이상이어야 합니다";
+    if (!formData.loginPw) {
+      newErrors.loginPw = "비밀번호를 입력해주세요";
+    } else if (formData.loginPw.length < 8) {
+      newErrors.loginPw = "비밀번호는 8자 이상이어야 합니다";
     }
 
     // 비밀번호 확인 검증
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "비밀번호 확인을 입력해주세요";
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "비밀번호가 일치하지 않습니다";
+    if (!formData.loginPwConfirm) {
+      newErrors.loginPwConfirm = "비밀번호 확인을 입력해주세요";
+    } else if (formData.loginPw !== formData.loginPwConfirm) {
+      newErrors.loginPwConfirm = "비밀번호가 일치하지 않습니다";
+    }
+
+    // 생년월일 검증
+    if (!formData.birthDate) {
+      newErrors.birthDate = "생년월일을 입력해주세요";
     }
 
     // 시설명 검증
-    if (!formData.facilityName.trim()) {
-      newErrors.facilityName = "시설명을 입력해주세요";
+    if (!formData.companyName.trim()) {
+      newErrors.companyName = "시설명을 입력해주세요";
     }
 
     // 대표자명 검증
@@ -140,12 +143,12 @@ export function AdminSignupForm() {
     }
 
     // 연락처 검증
-    if (!formData.phone.trim()) {
-      newErrors.phone = "연락처를 입력해주세요";
+    if (!formData.phoneNumber.trim()) {
+      newErrors.phoneNumber = "연락처를 입력해주세요";
     } else {
-      const phoneRegex = /^010-\d{4}-\d{4}$/;
-      if (!phoneRegex.test(formData.phone)) {
-        newErrors.phone = "010-0000-0000 형식으로 입력해주세요";
+      const phoneRegex = /^010\d{4}\d{4}$/;
+      if (!phoneRegex.test(formData.phoneNumber)) {
+        newErrors.phoneNumber = "01000000000 형식으로 입력해주세요";
       }
     }
 
@@ -159,56 +162,54 @@ export function AdminSignupForm() {
       }
     }
 
-    // 주소 검증
-    if (!formData.address.trim()) {
-      newErrors.address = "주소를 입력해주세요";
+    // 사업자등록번호 검증
+    if (!formData.businessRegistrationNumber) {
+      newErrors.businessRegistrationNumber = "사업자등록번호를 입력해주세요";
     }
 
-    // 사업자등록증 검증
-    if (!formData.businessRegistration) {
-      newErrors.businessRegistration = "사업자등록증 사본을 업로드해주세요";
+    // 개업일 검증
+    if (!formData.openingDate) {
+      newErrors.openingDate = "개업일을 입력해주세요";
+    }
+
+    // 주소 검증
+    if (!formData.companyAddress.trim()) {
+      newErrors.companyAddress = "주소를 입력해주세요";
+    }
+
+    // 사업자등록증 파일 검증
+    if (!formData.businessRegistrationFile) {
+      newErrors.businessRegistrationFile = "사업자등록증 사본을 업로드해주세요";
     }
 
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
-
-    try {
-      // 실제 구현에서는 API 호출
-      console.log("관리자 회원가입 데이터:", {
-        ...formData,
-        businessRegistration: formData.businessRegistration?.name,
-      });
-
-      // 시뮬레이션을 위한 지연
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      setSubmitSuccess(true);
-
-      // 3초 후 로그인 페이지로 이동
-      setTimeout(() => {
-        router.push("/admin/login");
-      }, 3000);
-    } catch (error) {
-      console.error("회원가입 실패:", error);
-      setErrors({
-        form: "회원가입에 실패했습니다. 다시 시도해주세요.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    onClickSignUpButton(formData);
+    setSubmitSuccess(true);
   };
 
+  const errorBlock =
+    error && error.code >= 400 ? (
+      <Alert variant="destructive" className="mb-4">
+        <AlertTitle>로그인 실패</AlertTitle>
+        <AlertDescription role="alert">{error.message}</AlertDescription>
+      </Alert>
+    ) : null;
+
   if (submitSuccess) {
+    setTimeout(() => {
+      router.push("/admin/login");
+    }, 2000);
+
     return (
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader className="text-center">
@@ -272,17 +273,17 @@ export function AdminSignupForm() {
                   아이디 <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="username"
-                  name="username"
-                  value={formData.username}
+                  id="loginId"
+                  name="loginId"
+                  value={formData.loginId}
                   onChange={handleInputChange}
                   placeholder="아이디를 입력하세요"
-                  className={`h-12 text-lg ${errors.username ? "border-red-500" : ""}`}
+                  className={`h-12 text-lg ${errors.loginId ? "border-red-500" : ""}`}
                 />
-                {errors.username && (
+                {errors.loginId && (
                   <div className="flex items-center text-red-500 text-sm">
                     <AlertCircle className="h-4 w-4 mr-1" />
-                    {errors.username}
+                    {errors.loginId}
                   </div>
                 )}
               </div>
@@ -293,17 +294,17 @@ export function AdminSignupForm() {
                   시설명 <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="facilityName"
-                  name="facilityName"
-                  value={formData.facilityName}
+                  id="companyName"
+                  name="companyName"
+                  value={formData.companyName}
                   onChange={handleInputChange}
                   placeholder="시설명을 입력하세요"
-                  className={`h-12 text-lg ${errors.facilityName ? "border-red-500" : ""}`}
+                  className={`h-12 text-lg ${errors.companyName ? "border-red-500" : ""}`}
                 />
-                {errors.facilityName && (
+                {errors.companyName && (
                   <div className="flex items-center text-red-500 text-sm">
                     <AlertCircle className="h-4 w-4 mr-1" />
-                    {errors.facilityName}
+                    {errors.companyName}
                   </div>
                 )}
               </div>
@@ -317,13 +318,13 @@ export function AdminSignupForm() {
                 </Label>
                 <div className="relative">
                   <Input
-                    id="password"
-                    name="password"
+                    id="loginPw"
+                    name="loginPw"
                     type={showPassword ? "text" : "password"}
-                    value={formData.password}
+                    value={formData.loginPw}
                     onChange={handleInputChange}
                     placeholder="비밀번호를 입력하세요"
-                    className={`h-12 text-lg pr-10 ${errors.password ? "border-red-500" : ""}`}
+                    className={`h-12 text-lg pr-10 ${errors.loginPw ? "border-red-500" : ""}`}
                   />
                   <button
                     type="button"
@@ -337,10 +338,10 @@ export function AdminSignupForm() {
                     )}
                   </button>
                 </div>
-                {errors.password && (
+                {errors.loginPw && (
                   <div className="flex items-center text-red-500 text-sm">
                     <AlertCircle className="h-4 w-4 mr-1" />
-                    {errors.password}
+                    {errors.loginPw}
                   </div>
                 )}
               </div>
@@ -352,13 +353,13 @@ export function AdminSignupForm() {
                 </Label>
                 <div className="relative">
                   <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
+                    id="loginPwConfirm"
+                    name="loginPwConfirm"
                     type={showConfirmPassword ? "text" : "password"}
-                    value={formData.confirmPassword}
+                    value={formData.loginPwConfirm}
                     onChange={handleInputChange}
                     placeholder="비밀번호를 다시 입력하세요"
-                    className={`h-12 text-lg pr-10 ${errors.confirmPassword ? "border-red-500" : ""}`}
+                    className={`h-12 text-lg pr-10 ${errors.loginPwConfirm ? "border-red-500" : ""}`}
                   />
                   <button
                     type="button"
@@ -372,10 +373,10 @@ export function AdminSignupForm() {
                     )}
                   </button>
                 </div>
-                {errors.confirmPassword && (
+                {errors.loginPwConfirm && (
                   <div className="flex items-center text-red-500 text-sm">
                     <AlertCircle className="h-4 w-4 mr-1" />
-                    {errors.confirmPassword}
+                    {errors.loginPwConfirm}
                   </div>
                 )}
               </div>
@@ -403,23 +404,41 @@ export function AdminSignupForm() {
                 )}
               </div>
 
+              {/* 생년월일 */}
+              <div className="space-y-2">
+                <Label htmlFor="birthDate" className="text-lg">
+                  생년월일 <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="birthDate"
+                  name="birthDate"
+                  type="date"
+                  value={formData.birthDate}
+                  onChange={handleInputChange}
+                  className={`h-12 text-lg ${errors.birthDate ? "border-red-500" : ""}`}
+                />
+                {errors.birthDate && (
+                  <div className="text-red-500 text-sm">{errors.birthDate}</div>
+                )}
+              </div>
+
               {/* 연락처 */}
               <div className="space-y-2">
                 <Label htmlFor="phone" className="text-lg">
                   연락처 <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
                   onChange={handleInputChange}
-                  placeholder="010-0000-0000"
-                  className={`h-12 text-lg ${errors.phone ? "border-red-500" : ""}`}
+                  placeholder="01000000000"
+                  className={`h-12 text-lg ${errors.phoneNumber ? "border-red-500" : ""}`}
                 />
-                {errors.phone && (
+                {errors.phoneNumber && (
                   <div className="flex items-center text-red-500 text-sm">
                     <AlertCircle className="h-4 w-4 mr-1" />
-                    {errors.phone}
+                    {errors.phoneNumber}
                   </div>
                 )}
               </div>
@@ -447,23 +466,59 @@ export function AdminSignupForm() {
               )}
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="businessRegistrationNumber" className="text-lg">
+                사업자등록번호 <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="businessRegistrationNumber"
+                name="businessRegistrationNumber"
+                value={formData.businessRegistrationNumber}
+                onChange={handleInputChange}
+                placeholder="0000000000"
+                className={`h-12 text-lg ${errors.businessRegistrationNumber ? "border-red-500" : ""}`}
+              />
+              {errors.businessRegistrationNumber && (
+                <div className="text-red-500 text-sm">
+                  {errors.businessRegistrationNumber}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="openingDate" className="text-lg">
+                개업일 <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="openingDate"
+                name="openingDate"
+                type="date"
+                value={formData.openingDate}
+                onChange={handleInputChange}
+                className={`h-12 text-lg ${errors.openingDate ? "border-red-500" : ""}`}
+              />
+              {errors.openingDate && (
+                <div className="text-red-500 text-sm">{errors.openingDate}</div>
+              )}
+            </div>
+
             {/* 주소 */}
             <div className="space-y-2">
               <Label htmlFor="address" className="text-lg">
                 주소 <span className="text-red-500">*</span>
               </Label>
               <Textarea
-                id="address"
-                name="address"
-                value={formData.address}
+                id="companyAddress"
+                name="companyAddress"
+                value={formData.companyAddress}
                 onChange={handleInputChange}
                 placeholder="주소를 입력하세요"
-                className={`min-h-[80px] text-lg ${errors.address ? "border-red-500" : ""}`}
+                className={`min-h-[80px] text-lg ${errors.companyAddress ? "border-red-500" : ""}`}
               />
-              {errors.address && (
+              {errors.companyAddress && (
                 <div className="flex items-center text-red-500 text-sm">
                   <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.address}
+                  {errors.companyAddress}
                 </div>
               )}
             </div>
@@ -506,7 +561,7 @@ export function AdminSignupForm() {
                       </Button>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {formData.businessRegistration?.name}
+                      {formData.businessRegistrationFile?.name}
                     </p>
                   </div>
                 ) : (
@@ -526,10 +581,10 @@ export function AdminSignupForm() {
                   </label>
                 )}
               </div>
-              {errors.businessRegistration && (
+              {errors.businessRegistrationFile && (
                 <div className="flex items-center text-red-500 text-sm">
                   <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.businessRegistration}
+                  {errors.businessRegistrationFile}
                 </div>
               )}
             </div>
@@ -542,6 +597,8 @@ export function AdminSignupForm() {
               </AlertDescription>
             </Alert>
           </div>
+
+          {errorBlock}
 
           <Button
             type="submit"

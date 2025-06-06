@@ -24,7 +24,7 @@ interface SignUpRequest {
   companyName: string;
   companyAddress: string;
   email: string;
-  businessRegistrationFile: File; // MultipartFile → File 타입 사용
+  businessRegistrationFile: File | null; // MultipartFile → File 타입 사용
   businessRegistrationNumber: string;
   openingDate: string;
   phoneNumber: string;
