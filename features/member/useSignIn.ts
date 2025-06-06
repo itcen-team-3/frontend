@@ -3,15 +3,21 @@
 import { useState } from "react";
 import { api } from "@/lib/http";
 import { SignInRequest, SignInResponse } from "@/lib/types/member";
+import { useRouter } from "next/navigation";
 
 export const useSignIn = () => {
+  const router = useRouter();
+
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState({
     code: 0,
     message: "",
   });
 
-  const signIn = async (body: SignInRequest) => {
+  const signIn = async (
+    body: SignInRequest,
+    type: "admin" | "caregiver" | "family"
+  ) => {
     setLoading(true);
     setError({
       code: 0,
@@ -20,7 +26,7 @@ export const useSignIn = () => {
 
     try {
       const res = await api.post<SignInResponse, SignInRequest>(
-        "/member/sign-in",
+        "/admin/login",
         { body }
       );
 
@@ -34,6 +40,14 @@ export const useSignIn = () => {
       }
 
       localStorage.setItem("access-token", res.data.accessToken);
+
+      if (type === "admin") {
+        router.push("/admin/dashboard");
+      } else if (type === "caregiver") {
+        router.push("/caregiver/dashboard");
+      } else if (type === "family") {
+        router.push("/family/dashboard");
+      }
     } catch (e: any) {
       console.log("sign-in error", e);
 

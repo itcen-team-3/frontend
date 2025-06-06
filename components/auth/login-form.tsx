@@ -91,8 +91,8 @@ export function LoginForm({
     console.log(formData.username);
     console.log(formData.password);
     onClickLoginButton({
-      id: formData.username,
-      password: formData.password,
+      loginId: formData.username,
+      loginPw: formData.password,
     });
   };
 
