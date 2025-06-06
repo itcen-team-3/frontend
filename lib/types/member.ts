@@ -1,7 +1,7 @@
 // sign-in
 interface SignInRequest {
-  id: string;
-  password: string;
+  loginId: string;
+  loginPw: string;
 }
 
 interface SignInResponse {
