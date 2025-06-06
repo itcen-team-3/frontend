@@ -22,8 +22,10 @@ import { CaregiverListItem } from "@/lib/types/member";
 import Loading from "../ui/loading-page";
 
 interface CaregiverListProps {
+  // get
   isLoading: boolean;
-  error: ErrorMessage;
+  errorGetCaregivers: ErrorMessage;
+  refetchGetCaregivers: (args: string) => void;
   onClickSearchButton: (args: string) => void;
   content: CaregiverListItem[];
   first: boolean;
@@ -32,12 +34,18 @@ interface CaregiverListProps {
   pageSize: number;
   totalElements: number;
   totalPages: number;
+  // delete
+  deleteCaregiver: (id: number | null) => void;
+  isDeleting: boolean;
+  errorDeleteCaregiver: ErrorMessage;
 }
 
 export function CaregiverList({
   isLoading,
+  refetchGetCaregivers,
   onClickSearchButton,
   content,
+  deleteCaregiver,
 }: CaregiverListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -54,9 +62,9 @@ export function CaregiverList({
     setDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    // 실제 구현에서는 여기서 삭제 API를 호출합니다
-    console.log(`Deleting caregiver with ID: ${selectedCaregiverId}`);
+  const handleDeleteConfirm = async () => {
+    await deleteCaregiver(selectedCaregiverId);
+    await refetchGetCaregivers(searchTerm);
     setDeleteDialogOpen(false);
   };
 
