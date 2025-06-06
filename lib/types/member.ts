@@ -40,10 +40,24 @@ interface RefreshTokenResponse {
   refreshToken: string;
 }
 
+// caregiver create
+interface CaregiverInfoRequest {
+  name: string;
+  birthDate: Date | undefined;
+  phoneNumber: string;
+  address: string;
+  certificateNumber: string;
+  career: string;
+  description: string;
+  profileImageUrl: string | null;
+  profileImage?: File | null;
+}
+
 export {
   type SignInRequest,
   type SignInResponse,
   type SignUpRequest,
   type RefreshTokenRequest,
   type RefreshTokenResponse,
+  type CaregiverInfoRequest,
 };
