@@ -1,6 +1,9 @@
 "use client";
 
 import type React from "react";
+import type { SignInRequest } from "@/lib/types/member";
+import type { ErrorMessage } from "@/lib/types/api";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -14,21 +17,41 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Image from "next/image";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
+import Loading from "../ui/loading-page";
 
 // userType prop 추가
 interface LoginFormProps {
   userType?: "caregiver" | "admin" | "family";
+  isLoading: boolean;
+  error: ErrorMessage;
+  onClickLoginButton: (args: SignInRequest) => void;
 }
 
-export function LoginForm({ userType = "caregiver" }: LoginFormProps) {
+export function LoginForm({
+  userType = "caregiver",
+  isLoading,
+  error,
+  onClickLoginButton,
+}: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  const errorBlock =
+    error && error.code >= 400 ? (
+      <Alert variant="destructive" className="mb-4">
+        <AlertTitle>로그인 실패</AlertTitle>
+        <AlertDescription role="alert">{error.message}</AlertDescription>
+      </Alert>
+    ) : null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -36,12 +59,6 @@ export function LoginForm({ userType = "caregiver" }: LoginFormProps) {
       ...prev,
       [name]: value,
     }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // 실제 구현에서는 여기서 로그인 API를 호출합니다
-    console.log("로그인 시도:", formData, "사용자 타입:", userType);
   };
 
   const getUserTypeText = () => {
@@ -69,6 +86,16 @@ export function LoginForm({ userType = "caregiver" }: LoginFormProps) {
     return links;
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log(formData.username);
+    console.log(formData.password);
+    onClickLoginButton({
+      id: formData.username,
+      password: formData.password,
+    });
+  };
+
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="space-y-2 text-center">
@@ -79,13 +106,13 @@ export function LoginForm({ userType = "caregiver" }: LoginFormProps) {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex justify-center">
-          <Image
+          {/* <Image
             src="/nursing-home-logo.png"
             alt="요양시설 로고"
             width={120}
             height={120}
             className="rounded-full"
-          />
+          /> */}
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -95,6 +122,9 @@ export function LoginForm({ userType = "caregiver" }: LoginFormProps) {
             <Input
               id="username"
               name="username"
+              autoFocus
+              autoComplete="username"
+              disabled={isLoading}
               placeholder="아이디를 입력하세요"
               value={formData.username}
               onChange={handleChange}
@@ -110,16 +140,19 @@ export function LoginForm({ userType = "caregiver" }: LoginFormProps) {
               <Input
                 id="password"
                 name="password"
+                disabled={isLoading}
                 type={showPassword ? "text" : "password"}
                 placeholder="비밀번호를 입력하세요"
                 value={formData.password}
                 onChange={handleChange}
+                autoComplete="current-password"
                 className="h-12 text-lg pr-10"
                 required
               />
               <button
                 type="button"
                 className="absolute right-3 top-3 text-gray-500"
+                aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
@@ -130,7 +163,14 @@ export function LoginForm({ userType = "caregiver" }: LoginFormProps) {
               </button>
             </div>
           </div>
-          <Button type="submit" className="w-full h-14 text-xl mt-4" size="lg">
+          {errorBlock}
+          <Button
+            type="submit"
+            className="w-full h-14 text-xl mt-4"
+            size="lg"
+            disabled={isLoading}
+          >
+            {isLoading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
             로그인
           </Button>
         </form>
