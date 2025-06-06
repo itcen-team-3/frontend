@@ -53,6 +53,23 @@ interface CaregiverInfoRequest {
   profileImage?: File | null;
 }
 
+// caregiver list
+interface CaregiverListItem {
+  caregiverId: number;
+  name: string;
+  phoneNumber: string;
+}
+
+interface CaregiverListResponse {
+  content: CaregiverListItem[];
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+  first: boolean;
+}
+
 export {
   type SignInRequest,
   type SignInResponse,
@@ -60,4 +77,6 @@ export {
   type RefreshTokenRequest,
   type RefreshTokenResponse,
   type CaregiverInfoRequest,
+  type CaregiverListItem,
+  type CaregiverListResponse,
 };
