@@ -70,6 +70,26 @@ interface CaregiverListResponse {
   first: boolean;
 }
 
+// caregiver detail
+interface CaregiverScheduleItem {
+  workDays: number;
+  patientName: string;
+  startTime: string;
+  endTime: string;
+}
+
+interface CaregiverDetailResponse {
+  caregiverId: number;
+  name: string;
+  birthDate: Date | undefined;
+  age: number;
+  phoneNumber: string;
+  address: string;
+  description: string;
+  profileImage?: string;
+  schedules: CaregiverScheduleItem[];
+}
+
 export {
   type SignInRequest,
   type SignInResponse,
@@ -79,4 +99,6 @@ export {
   type CaregiverInfoRequest,
   type CaregiverListItem,
   type CaregiverListResponse,
+  type CaregiverScheduleItem,
+  type CaregiverDetailResponse,
 };
