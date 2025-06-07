@@ -8,7 +8,7 @@ import { ErrorMessage } from "@/lib/types/api";
 export const useGetCaregiverNameList = () => {
   const [caregiverNameList, setCaregiverNameList] =
     useState<CaregiverNameListResponse | null>(null);
-  const [isCaregiverNameListLoading, seCaregiverNameListtLoading] =
+  const [isCaregiverNameListLoading, setIsCaregiverNameListLoading] =
     useState(true);
   const [errorCaregiverNameList, setErrorCaregiverNameList] =
     useState<ErrorMessage>({
@@ -19,7 +19,7 @@ export const useGetCaregiverNameList = () => {
   useEffect(() => {
     const fetchCaregiverNameList = async () => {
       const companyId = localStorage.getItem("company-id");
-      seCaregiverNameListtLoading(true);
+      setIsCaregiverNameListLoading(true);
       setErrorCaregiverNameList({
         code: 0,
         message: "",
@@ -38,7 +38,7 @@ export const useGetCaregiverNameList = () => {
             "요양보호사 이름 리스트 조회에 실패했습니다.",
         });
       } finally {
-        seCaregiverNameListtLoading(false);
+        setIsCaregiverNameListLoading(false);
       }
     };
 
