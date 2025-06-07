@@ -1,18 +1,25 @@
+"use client";
+
 import { CaregiverForm } from "@/components/caregivers/caregiver-form";
+import Loading from "@/components/ui/loading-page";
+import { useEditCaregiver } from "@/features/member/useEditCaregiver";
+import { useGetCaregiverForUpdate } from "@/features/member/useGetCaregiverForUpdate";
+import { useParams } from "next/navigation";
 
 export default function EditCaregiverPage() {
-  // 실제 구현에서는 ID를 기반으로 데이터를 가져옵니다
-  const mockData = {
-    name: "김요양",
-    birthDate: undefined,
-    age: "45",
-    address: "서울시 강남구",
-    phone: "010-1234-5678",
-    bio: "10년 경력의 요양보호사입니다. 환자 케어에 최선을 다하겠습니다.",
-    imageUrl: "/diverse-woman-portrait.png",
-    licenseNumber: "LC-2020-001234",
-    experience: "10",
-  };
+  const { id } = useParams() as { id?: string };
+  const { editCaregiver } = useEditCaregiver();
+  const { data } = useGetCaregiverForUpdate(id);
 
-  return <CaregiverForm mode="edit" initialData={mockData} />;
+  if (!data) {
+    return <Loading />;
+  }
+
+  return (
+    <CaregiverForm
+      mode="edit"
+      initialData={data}
+      onClickSaveButton={(value) => editCaregiver(id, value)}
+    />
+  );
 }

@@ -1,7 +1,9 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import type { CaregiverInfoRequest } from "@/lib/types/member";
+
+import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
@@ -22,53 +24,47 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
+// import { useRouter } from "next/navigation";
 
 interface CaregiverFormProps {
   mode: "create" | "edit";
-  initialData?: {
-    name: string;
-    birthDate: Date | undefined;
-    address: string;
-    phone: string;
-    bio: string;
-    imageUrl: string;
-    licenseNumber: string;
-    experience: string;
-  };
+  initialData: CaregiverInfoRequest;
+  onClickSaveButton: (args: CaregiverInfoRequest) => void;
+}
+
+interface FormErrors {
+  [key: string]: string;
 }
 
 export function CaregiverForm({
   mode = "create",
-  initialData = {
-    name: "",
-    birthDate: undefined,
-    address: "",
-    phone: "",
-    bio: "",
-    imageUrl: "",
-    licenseNumber: "",
-    experience: "",
-  },
+  initialData,
+  onClickSaveButton,
 }: CaregiverFormProps) {
-  const [formData, setFormData] = useState(
+  // const router = useRouter();
+
+  const [formData, setFormData] = useState<CaregiverInfoRequest>(
     mode === "create"
       ? {
           name: "",
           birthDate: undefined,
           address: "",
-          phone: "",
-          bio: "",
-          imageUrl: "",
-          licenseNumber: "",
-          experience: "",
+          phoneNumber: "",
+          description: "",
+          profileImage: "",
+          certificateNumber: "",
+          career: "",
+          profileImageFile: null,
         }
-      : initialData,
+      : initialData
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -84,26 +80,47 @@ export function CaregiverForm({
     }
   };
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
 
+    // 필수 필드 검증
     if (!formData.name.trim()) {
       newErrors.name = "이름을 입력해주세요";
     }
+
     if (!formData.birthDate) {
-      newErrors.birthDate = "생년월일을 입력해주세요";
+      newErrors.birthDate = "생년월일을 선택해주세요";
+    } else {
+      const age = calculateAge(formData.birthDate);
+      if (age < 18 || age > 80) {
+        newErrors.birthDate = "18세 이상 80세 이하만 등록 가능합니다";
+      }
     }
-    if (!formData.phone.trim()) {
-      newErrors.phone = "연락처를 입력해주세요";
+
+    if (!formData.phoneNumber.trim()) {
+      newErrors.phoneNumber = "연락처를 입력해주세요";
+    } else {
+      const phoneRegex = /^010-\d{4}-\d{4}$/;
+      if (!phoneRegex.test(formData.phoneNumber)) {
+        newErrors.phoneNumber = "010-0000-0000 형식으로 입력해주세요";
+      }
     }
+
     if (!formData.address.trim()) {
       newErrors.address = "주소를 입력해주세요";
     }
-    if (!formData.licenseNumber.trim()) {
-      newErrors.licenseNumber = "자격증 번호를 입력해주세요";
+
+    if (!formData.certificateNumber.trim()) {
+      newErrors.certificateNumber = "요양보호사 자격증 번호를 입력해주세요";
     }
-    if (!formData.experience.trim()) {
-      newErrors.experience = "경력을 입력해주세요";
+
+    if (!String(formData.career).trim()) {
+      newErrors.career = "경력을 입력해주세요";
+    } else {
+      const career = Number.parseInt(formData.career);
+      if (isNaN(career) || career < 0 || career > 50) {
+        newErrors.career = "0년 이상 50년 이하로 입력해주세요";
+      }
     }
 
     setErrors(newErrors);
@@ -119,19 +136,26 @@ export function CaregiverForm({
 
     setIsSubmitting(true);
 
-    try {
-      // 실제 구현에서는 여기서 API를 호출합니다
-      console.log("Submitting caregiver data:", formData);
+    const fileInput = fileInputRef.current;
+    const data = {
+      ...formData,
+      profileImageFile: fileInput?.files?.[0] ? fileInput.files[0] : null,
+    };
 
-      // 시뮬레이션을 위한 지연
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    await onClickSaveButton(data);
+    setIsSubmitting(false);
+  };
 
-      // 성공 시 목록 페이지로 이동
-      // router.push('/admin/caregivers')
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    } finally {
-      setIsSubmitting(false);
+  const handleImageUpload = () => {
+    if (!fileInputRef.current) return;
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setFormData((prev) => ({ ...prev, profileImage: url }));
     }
   };
 
@@ -142,21 +166,19 @@ export function CaregiverForm({
       : "요양보호사 정보를 수정합니다";
   const buttonText = mode === "create" ? "등록하기" : "수정하기";
 
-  const calculateAge = (birthDate: Date | undefined): number | null => {
-    if (!birthDate) return null;
+  const calculateAge = (birthDate: Date): number => {
+    const birth = new Date(birthDate);
 
     const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const month = today.getMonth() - birthDate.getMonth();
+    let age = today.getFullYear() - birth.getFullYear();
+    const month = today.getMonth() - birth.getMonth();
 
-    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+    if (month < 0 || (month === 0 && today.getDate() < birth.getDate())) {
       age--;
     }
 
     return age;
   };
-
-  const age = calculateAge(formData.birthDate);
 
   return (
     <PageContainer>
@@ -194,13 +216,13 @@ export function CaregiverForm({
                 <Avatar className="w-32 h-32">
                   <AvatarImage
                     src={
-                      formData.imageUrl ||
+                      formData?.profileImage ||
                       "/placeholder.svg?height=128&width=128&query=person"
                     }
                     alt="프로필 이미지"
                   />
                   <AvatarFallback className="text-4xl">
-                    {formData.name ? formData.name[0] : "요"}
+                    {formData?.name ? formData?.name[0] : "요"}
                   </AvatarFallback>
                 </Avatar>
                 <Button
@@ -208,9 +230,17 @@ export function CaregiverForm({
                   variant="secondary"
                   size="icon"
                   className="absolute bottom-0 right-0 rounded-full w-10 h-10"
+                  onClick={handleImageUpload}
                 >
                   <Camera className="h-5 w-5" />
                 </Button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
               </div>
             </div>
 
@@ -222,7 +252,7 @@ export function CaregiverForm({
                 <Input
                   id="name"
                   name="name"
-                  value={formData.name}
+                  value={formData?.name}
                   onChange={handleChange}
                   placeholder="요양보호사 이름을 입력하세요"
                   className={`text-lg h-14 ${errors.name ? "border-red-500" : ""}`}
@@ -243,12 +273,12 @@ export function CaregiverForm({
                       variant="outline"
                       className={cn(
                         "w-full justify-start text-left text-lg font-normal h-14",
-                        !formData.birthDate && "text-muted-foreground",
-                        errors.birthDate ? "border-red-500" : "",
+                        !formData?.birthDate && "text-muted-foreground",
+                        errors.birthDate ? "border-red-500" : ""
                       )}
                     >
                       <CalendarIcon className="mr-2 h-5 w-5" />
-                      {formData.birthDate
+                      {formData?.birthDate
                         ? format(formData.birthDate, "yyyy년 MM월 dd일", {
                             locale: ko,
                           })
@@ -258,7 +288,7 @@ export function CaregiverForm({
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={formData.birthDate}
+                      selected={formData?.birthDate}
                       onSelect={(date) => {
                         setFormData((prev) => ({ ...prev, birthDate: date }));
                         if (errors.birthDate) {
@@ -288,9 +318,9 @@ export function CaregiverForm({
                 {errors.birthDate && (
                   <p className="text-red-500 text-sm">{errors.birthDate}</p>
                 )}
-                {age !== null && (
-                  <p className="text-sm text-muted-foreground">만 {age}세</p>
-                )}
+                <p className="text-sm text-muted-foreground">
+                  만 {calculateAge(formData.birthDate || new Date())}세
+                </p>
               </div>
             </div>
 
@@ -301,7 +331,7 @@ export function CaregiverForm({
               <Input
                 id="phone"
                 name="phone"
-                value={formData.phone}
+                value={formData?.phoneNumber}
                 onChange={handleChange}
                 placeholder="010-0000-0000"
                 className={`text-lg h-14 ${errors.phone ? "border-red-500" : ""}`}
@@ -318,7 +348,7 @@ export function CaregiverForm({
               <Input
                 id="address"
                 name="address"
-                value={formData.address}
+                value={formData?.address}
                 onChange={handleChange}
                 placeholder="서울시 강남구 테헤란로 123"
                 className={`text-lg h-14 ${errors.address ? "border-red-500" : ""}`}
@@ -342,7 +372,7 @@ export function CaregiverForm({
               <Input
                 id="licenseNumber"
                 name="licenseNumber"
-                value={formData.licenseNumber}
+                value={formData?.certificateNumber}
                 onChange={handleChange}
                 placeholder="자격증 번호를 입력하세요"
                 className={`text-lg h-14 ${errors.licenseNumber ? "border-red-500" : ""}`}
@@ -360,7 +390,7 @@ export function CaregiverForm({
                 id="experience"
                 name="experience"
                 type="number"
-                value={formData.experience}
+                value={formData?.career}
                 onChange={handleChange}
                 placeholder="경력을 년 단위로 입력하세요"
                 className={`text-lg h-14 ${errors.experience ? "border-red-500" : ""}`}
@@ -389,7 +419,7 @@ export function CaregiverForm({
               <Textarea
                 id="bio"
                 name="bio"
-                value={formData.bio}
+                value={formData?.description}
                 onChange={handleChange}
                 placeholder="간단한 자기소개와 요양보호사로서의 경험이나 철학을 입력해주세요"
                 className="min-h-[120px] text-lg"
