@@ -1,7 +1,9 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import type { PatientInfoRequest } from "@/lib/types/member";
+
+import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
@@ -26,7 +28,6 @@ import {
 } from "@/components/ui/select";
 import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useRouter } from "next/navigation";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -36,38 +37,37 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
+import { ErrorMessage } from "@/lib/types/api";
 
-interface FormData {
-  name: string;
-  birthDate: Date | undefined;
-  phone: string;
-  address: string;
-  careGrade: string;
-  familyContact: string;
-  familyRelation: string;
-  guardianName: string;
-  medicalNotes: string;
-  imageUrl: string;
+interface PatientRegistrationFormProps {
+  isLoading: boolean;
+  error: ErrorMessage;
+  onClickCreatePatientButton: (args: PatientInfoRequest) => void;
 }
 
 interface FormErrors {
   [key: string]: string;
 }
 
-export function PatientRegistrationForm() {
-  const router = useRouter();
+export function PatientRegistrationForm({
+  onClickCreatePatientButton,
+}: PatientRegistrationFormProps) {
+  // const router = useRouter();
 
-  const [formData, setFormData] = useState<FormData>({
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [formData, setFormData] = useState<PatientInfoRequest>({
     name: "",
     birthDate: undefined,
-    phone: "",
+    phoneNumber: "",
     address: "",
-    careGrade: "",
-    familyContact: "",
-    familyRelation: "",
+    patientLevel: "",
+    guardianPhoneNumber: "",
+    relationship: "",
     guardianName: "",
-    medicalNotes: "",
-    imageUrl: "",
+    description: "",
+    profileImage: "",
+    profileImageFile: null,
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -118,12 +118,12 @@ export function PatientRegistrationForm() {
       newErrors.birthDate = "생년월일을 선택해주세요";
     }
 
-    if (!formData.phone.trim()) {
-      newErrors.phone = "연락처를 입력해주세요";
+    if (!formData.phoneNumber.trim()) {
+      newErrors.phoneNumber = "연락처를 입력해주세요";
     } else {
       const phoneRegex = /^010-\d{4}-\d{4}$/;
-      if (!phoneRegex.test(formData.phone)) {
-        newErrors.phone = "010-0000-0000 형식으로 입력해주세요";
+      if (!phoneRegex.test(formData.phoneNumber)) {
+        newErrors.phoneNumber = "010-0000-0000 형식으로 입력해주세요";
       }
     }
 
@@ -131,16 +131,16 @@ export function PatientRegistrationForm() {
       newErrors.address = "주소를 입력해주세요";
     }
 
-    if (!formData.careGrade) {
-      newErrors.careGrade = "장기요양등급을 선택해주세요";
+    if (!formData.patientLevel) {
+      newErrors.patientLevel = "장기요양등급을 선택해주세요";
     }
 
-    if (!formData.familyContact.trim()) {
-      newErrors.familyContact = "가족 연락처를 입력해주세요";
+    if (!formData.guardianPhoneNumber.trim()) {
+      newErrors.guardianPhoneNumber = "가족 연락처를 입력해주세요";
     }
 
-    if (!formData.familyRelation) {
-      newErrors.familyRelation = "가족 관계를 선택해주세요";
+    if (!formData.relationship) {
+      newErrors.relationship = "가족 관계를 선택해주세요";
     }
 
     if (!formData.guardianName.trim()) {
@@ -160,29 +160,16 @@ export function PatientRegistrationForm() {
 
     setIsSubmitting(true);
 
-    try {
-      // 실제 구현에서는 API 호출
-      console.log("보호대상자 등록 데이터:", formData);
+    const fileInput = fileInputRef.current;
+    const data = {
+      ...formData,
+      profileImageFile: fileInput?.files?.[0] ? fileInput.files[0] : null,
+    };
 
-      // 시뮬레이션을 위한 지연
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      alert("보호대상자가 성공적으로 등록되었습니다!");
-      router.push("/admin/patients");
-    } catch (error) {
-      console.error("등록 실패:", error);
-      alert("등록에 실패했습니다. 다시 시도해주세요.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    onClickCreatePatientButton(data);
   };
 
-  const handleImageUpload = () => {
-    // 실제 구현에서는 파일 업로드 처리
-    console.log("이미지 업로드");
-  };
-
-  const getCareGradeText = (grade: string) => {
+  const getPatientLevelTest = (grade: string) => {
     switch (grade) {
       case "1":
         return "1등급 (가장 중증)";
@@ -213,6 +200,19 @@ export function PatientRegistrationForm() {
     }
 
     return age;
+  };
+
+  const handleImageUpload = () => {
+    if (!fileInputRef.current) return;
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setFormData((prev) => ({ ...prev, profileImage: url }));
+    }
   };
 
   return (
@@ -251,7 +251,7 @@ export function PatientRegistrationForm() {
                 <Avatar className="w-32 h-32">
                   <AvatarImage
                     src={
-                      formData.imageUrl ||
+                      formData.profileImage ||
                       "/placeholder.svg?height=128&width=128&query=elderly person"
                     }
                     alt="프로필 이미지"
@@ -269,6 +269,13 @@ export function PatientRegistrationForm() {
                 >
                   <Camera className="h-5 w-5" />
                 </Button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
               </div>
             </div>
 
@@ -358,17 +365,17 @@ export function PatientRegistrationForm() {
 
             {/* 장기요양등급 */}
             <div className="space-y-2">
-              <Label htmlFor="careGrade" className="text-lg">
+              <Label htmlFor="patientLevel" className="text-lg">
                 장기요양등급 <span className="text-red-500">*</span>
               </Label>
               <Select
-                value={formData.careGrade}
+                value={formData.patientLevel}
                 onValueChange={(value) =>
-                  handleSelectChange("careGrade", value)
+                  handleSelectChange("patientLevel", value)
                 }
               >
                 <SelectTrigger
-                  className={`text-lg h-14 ${errors.careGrade ? "border-red-500" : ""}`}
+                  className={`text-lg h-14 ${errors.patientLevel ? "border-red-500" : ""}`}
                 >
                   <SelectValue placeholder="장기요양등급을 선택하세요" />
                 </SelectTrigger>
@@ -393,10 +400,10 @@ export function PatientRegistrationForm() {
                   </SelectItem>
                 </SelectContent>
               </Select>
-              {errors.careGrade && (
+              {errors.patientLevel && (
                 <div className="flex items-center text-red-500 text-sm">
                   <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.careGrade}
+                  {errors.patientLevel}
                 </div>
               )}
               <p className="text-sm text-muted-foreground">
@@ -414,38 +421,38 @@ export function PatientRegistrationForm() {
           <CardContent className="space-y-6">
             {/* 본인 연락처 */}
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-lg">
+              <Label htmlFor="phoneNumber" className="text-lg">
                 본인 연락처 <span className="text-red-500">*</span>
               </Label>
               <Input
-                id="phone"
-                name="phone"
-                value={formData.phone}
+                id="phoneNumber"
+                name="phoneNumber"
+                value={formData.phoneNumber}
                 onChange={handleInputChange}
                 placeholder="010-0000-0000"
-                className={`text-lg h-14 ${errors.phone ? "border-red-500" : ""}`}
+                className={`text-lg h-14 ${errors.phoneNumber ? "border-red-500" : ""}`}
               />
-              {errors.phone && (
+              {errors.phoneNumber && (
                 <div className="flex items-center text-red-500 text-sm">
                   <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.phone}
+                  {errors.phoneNumber}
                 </div>
               )}
             </div>
 
             {/* 가족 관계 */}
             <div className="space-y-2">
-              <Label htmlFor="familyRelation" className="text-lg">
+              <Label htmlFor="relationship" className="text-lg">
                 가족 관계 <span className="text-red-500">*</span>
               </Label>
               <Select
-                value={formData.familyRelation}
+                value={formData.relationship}
                 onValueChange={(value) =>
-                  handleSelectChange("familyRelation", value)
+                  handleSelectChange("relationship", value)
                 }
               >
                 <SelectTrigger
-                  className={`text-lg h-14 ${errors.familyRelation ? "border-red-500" : ""}`}
+                  className={`text-lg h-14 ${errors.relationship ? "border-red-500" : ""}`}
                 >
                   <SelectValue placeholder="가족 관계를 선택하세요" />
                 </SelectTrigger>
@@ -476,10 +483,10 @@ export function PatientRegistrationForm() {
                   </SelectItem>
                 </SelectContent>
               </Select>
-              {errors.familyRelation && (
+              {errors.relationship && (
                 <div className="flex items-center text-red-500 text-sm">
                   <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.familyRelation}
+                  {errors.relationship}
                 </div>
               )}
             </div>
@@ -505,21 +512,21 @@ export function PatientRegistrationForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="familyContact" className="text-lg">
+              <Label htmlFor="guardianPhoneNumber" className="text-lg">
                 가족 연락처 <span className="text-red-500">*</span>
               </Label>
               <Input
-                id="familyContact"
-                name="familyContact"
-                value={formData.familyContact}
+                id="guardianPhoneNumber"
+                name="guardianPhoneNumber"
+                value={formData.guardianPhoneNumber}
                 onChange={handleInputChange}
                 placeholder="010-0000-0000"
-                className={`text-lg h-14 ${errors.familyContact ? "border-red-500" : ""}`}
+                className={`text-lg h-14 ${errors.guardianPhoneNumber ? "border-red-500" : ""}`}
               />
-              {errors.familyContact && (
+              {errors.guardianPhoneNumber && (
                 <div className="flex items-center text-red-500 text-sm">
                   <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.familyContact}
+                  {errors.guardianPhoneNumber}
                 </div>
               )}
             </div>
@@ -554,13 +561,13 @@ export function PatientRegistrationForm() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="medicalNotes" className="text-lg">
+              <Label htmlFor="description" className="text-lg">
                 건강 상태 및 특이사항
               </Label>
               <Textarea
-                id="medicalNotes"
-                name="medicalNotes"
-                value={formData.medicalNotes}
+                id="description"
+                name="description"
+                value={formData.description}
                 onChange={handleInputChange}
                 placeholder="복용 중인 약물, 알레르기, 주의사항, 기존 질병 등을 상세히 입력하세요"
                 className="min-h-[120px] text-lg"
@@ -574,7 +581,7 @@ export function PatientRegistrationForm() {
         </Card>
 
         {/* 등록 정보 요약 */}
-        {formData.name && formData.birthDate && formData.careGrade && (
+        {formData.name && formData.birthDate && formData.patientLevel && (
           <Card className="card-shadow bg-muted/30">
             <CardHeader>
               <CardTitle className="text-xl">등록 정보 요약</CardTitle>
@@ -594,7 +601,7 @@ export function PatientRegistrationForm() {
                 <div className="p-3 border rounded-lg bg-white">
                   <p className="text-sm text-muted-foreground">장기요양등급</p>
                   <p className="text-lg font-medium">
-                    {getCareGradeText(formData.careGrade)}
+                    {getPatientLevelTest(formData.patientLevel)}
                   </p>
                 </div>
               </div>
