@@ -45,6 +45,7 @@ interface FormData {
   careGrade: string;
   familyContact: string;
   familyRelation: string;
+  guardianName: string;
   medicalNotes: string;
   imageUrl: string;
 }
@@ -64,6 +65,7 @@ export function PatientRegistrationForm() {
     careGrade: "",
     familyContact: "",
     familyRelation: "",
+    guardianName: "",
     medicalNotes: "",
     imageUrl: "",
   });
@@ -72,7 +74,7 @@ export function PatientRegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -139,6 +141,10 @@ export function PatientRegistrationForm() {
 
     if (!formData.familyRelation) {
       newErrors.familyRelation = "가족 관계를 선택해주세요";
+    }
+
+    if (!formData.guardianName.trim()) {
+      newErrors.guardianName = "보호자 이름을 입력해주세요";
     }
 
     setErrors(newErrors);
@@ -301,7 +307,7 @@ export function PatientRegistrationForm() {
                       className={cn(
                         "w-full justify-start text-left text-lg font-normal h-14",
                         !formData.birthDate && "text-muted-foreground",
-                        errors.birthDate ? "border-red-500" : "",
+                        errors.birthDate ? "border-red-500" : ""
                       )}
                     >
                       <CalendarIcon className="mr-2 h-5 w-5" />
@@ -474,6 +480,26 @@ export function PatientRegistrationForm() {
                 <div className="flex items-center text-red-500 text-sm">
                   <AlertCircle className="h-4 w-4 mr-1" />
                   {errors.familyRelation}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="guardianName" className="text-lg">
+                보호자 이름 <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="guardianName"
+                name="guardianName"
+                value={formData.guardianName}
+                onChange={handleInputChange}
+                placeholder="보호자 이름을 입력하세요"
+                className={`text-lg h-14 ${errors.guardianName ? "border-red-500" : ""}`}
+              />
+              {errors.guardianName && (
+                <div className="flex items-center text-red-500 text-sm">
+                  <AlertCircle className="h-4 w-4 mr-1" />
+                  {errors.guardianName}
                 </div>
               )}
             </div>

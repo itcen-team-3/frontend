@@ -21,6 +21,7 @@ interface PatientDetailProps {
   phone: string;
   medicalNotes: string;
   familyContact: string;
+  guardianName: string;
   imageUrl?: string;
   schedules: PatientSchedule[];
 }
@@ -33,6 +34,7 @@ export function PatientDetail({
   phone = "010-1234-5678",
   medicalNotes = "고혈압 약 복용 중, 거동이 불편하여 휠체어 사용",
   familyContact = "010-9876-5432 (아들)",
+  guardianName = "이보호",
   imageUrl = "/elderly-woman-knitting.png",
   schedules = [
     {
@@ -95,6 +97,10 @@ export function PatientDetail({
               <div className="flex items-center p-3 border rounded-lg">
                 <User className="h-5 w-5 mr-3 text-muted-foreground" />
                 <span className="text-lg">{familyContact}</span>
+              </div>
+              <div className="flex items-center p-3 border rounded-lg">
+                <User className="h-5 w-5 mr-3 text-muted-foreground" />
+                <span className="text-lg">{guardianName} (보호자)</span>
               </div>
             </div>
           </CardContent>
