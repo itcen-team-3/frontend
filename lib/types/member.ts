@@ -106,6 +106,23 @@ interface PatientInfoRequest {
   profileImageFile?: File | null;
 }
 
+// patient list
+interface PatientListItem {
+  patientId: number;
+  name: string;
+  age: number;
+}
+
+interface PatientListResponse {
+  content: PatientListItem[];
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+  first: boolean;
+}
+
 export {
   type SignInRequest,
   type SignInResponse,
@@ -118,4 +135,6 @@ export {
   type CaregiverScheduleItem,
   type CaregiverDetailResponse,
   type PatientInfoRequest,
+  type PatientListItem,
+  type PatientListResponse,
 };
