@@ -158,6 +158,15 @@ interface CaregiverNameListResponse {
   caregivers: CaregiverNameListItem[];
 }
 
+interface PatientNameListItem {
+  patientId: number;
+  patientName: string;
+}
+
+interface PatientNameListResponse {
+  patients: PatientNameListItem[];
+}
+
 export {
   type SignInRequest,
   type SignInResponse,
@@ -176,4 +185,6 @@ export {
   type PatientDetailResponse,
   type CaregiverNameListItem,
   type CaregiverNameListResponse,
+  type PatientNameListItem,
+  type PatientNameListResponse,
 };
