@@ -1,7 +1,8 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+
+import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
@@ -34,11 +35,17 @@ import { PatientInfoRequest } from "@/lib/types/member";
 interface PatientFormProps {
   mode: "create" | "edit";
   initialData: PatientInfoRequest;
+  onClickSaveButton: (args: PatientInfoRequest) => void;
+}
+
+interface FormErrors {
+  [key: string]: string;
 }
 
 export function PatientForm({
   mode = "create",
   initialData,
+  onClickSaveButton,
 }: PatientFormProps) {
   const [formData, setFormData] = useState<PatientInfoRequest>(
     mode === "create"
@@ -58,6 +65,8 @@ export function PatientForm({
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -103,30 +112,43 @@ export function PatientForm({
     }
   };
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
 
+    // 필수 필드 검증
     if (!formData.name.trim()) {
       newErrors.name = "이름을 입력해주세요";
     }
+
     if (!formData.birthDate) {
-      newErrors.birthDate = "생년월일을 입력해주세요";
+      newErrors.birthDate = "생년월일을 선택해주세요";
     }
+
     if (!formData.phoneNumber.trim()) {
       newErrors.phoneNumber = "연락처를 입력해주세요";
+    } else {
+      const phoneRegex = /^010-\d{4}-\d{4}$/;
+      if (!phoneRegex.test(formData.phoneNumber)) {
+        newErrors.phoneNumber = "010-0000-0000 형식으로 입력해주세요";
+      }
     }
+
     if (!formData.address.trim()) {
       newErrors.address = "주소를 입력해주세요";
     }
+
     if (!formData.patientLevel) {
-      newErrors.patientLevel = "등급을 선택해주세요";
+      newErrors.patientLevel = "장기요양등급을 선택해주세요";
     }
+
     if (!formData.guardianPhoneNumber.trim()) {
       newErrors.guardianPhoneNumber = "가족 연락처를 입력해주세요";
     }
+
     if (!formData.relationship) {
       newErrors.relationship = "가족 관계를 선택해주세요";
     }
+
     if (!formData.guardianName.trim()) {
       newErrors.guardianName = "보호자 이름을 입력해주세요";
     }
@@ -144,20 +166,14 @@ export function PatientForm({
 
     setIsSubmitting(true);
 
-    try {
-      // 실제 구현에서는 여기서 API를 호출합니다
-      console.log("Submitting patient data:", formData);
+    const fileInput = fileInputRef.current;
+    const data = {
+      ...formData,
+      profileImageFile: fileInput?.files?.[0] ? fileInput.files[0] : null,
+    };
 
-      // 시뮬레이션을 위한 지연
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // 성공 시 목록 페이지로 이동
-      // router.push('/admin/patients')
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await onClickSaveButton(data);
+    setIsSubmitting(false);
   };
 
   const title = mode === "create" ? "보호대상자 등록" : "보호대상자 정보 수정";
@@ -179,6 +195,19 @@ export function PatientForm({
     }
 
     return age;
+  };
+
+  const handleImageUpload = () => {
+    if (!fileInputRef.current) return;
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setFormData((prev) => ({ ...prev, profileImage: url }));
+    }
   };
 
   return (
@@ -231,9 +260,17 @@ export function PatientForm({
                   variant="secondary"
                   size="icon"
                   className="absolute bottom-0 right-0 rounded-full w-10 h-10"
+                  onClick={handleImageUpload}
                 >
                   <Camera className="h-5 w-5" />
                 </Button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
               </div>
             </div>
 
