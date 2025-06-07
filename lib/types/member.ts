@@ -91,6 +91,21 @@ interface CaregiverDetailResponse {
   schedules: CaregiverScheduleItem[];
 }
 
+// patient create
+interface PatientInfoRequest {
+  name: string;
+  birthDate: Date | undefined;
+  address: string;
+  phoneNumber: string;
+  patientLevel: string;
+  guardianPhoneNumber: string;
+  guardianName: string;
+  relationship: string;
+  description: string;
+  profileImage: string | null;
+  profileImageFile?: File | null;
+}
+
 export {
   type SignInRequest,
   type SignInResponse,
@@ -102,4 +117,5 @@ export {
   type CaregiverListResponse,
   type CaregiverScheduleItem,
   type CaregiverDetailResponse,
+  type PatientInfoRequest,
 };
