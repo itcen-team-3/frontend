@@ -42,6 +42,7 @@ interface RefreshTokenResponse {
 
 // caregiver create
 interface CaregiverInfoRequest {
+  caregiverId?: number;
   name: string;
   birthDate: Date | undefined;
   phoneNumber: string;
