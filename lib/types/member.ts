@@ -123,6 +123,30 @@ interface PatientListResponse {
   first: boolean;
 }
 
+// patient detail
+interface PatientScheduleItem {
+  workDays: number;
+  caregiverName: string; // TODO : check 해볼 것
+  startTime: string;
+  endTime: string;
+}
+
+interface PatientDetailResponse {
+  patientId: number;
+  name: string;
+  birthDate: Date | undefined;
+  age: number;
+  address: string;
+  phoneNumber: string;
+  patientLevel: string;
+  guardianPhoneNumber: string;
+  guardianName: string;
+  relationship: string;
+  description: string;
+  profileImage?: string;
+  schedules: PatientScheduleItem[];
+}
+
 export {
   type SignInRequest,
   type SignInResponse,
@@ -137,4 +161,6 @@ export {
   type PatientInfoRequest,
   type PatientListItem,
   type PatientListResponse,
+  type PatientScheduleItem,
+  type PatientDetailResponse,
 };
