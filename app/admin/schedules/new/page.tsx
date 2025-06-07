@@ -4,6 +4,7 @@ import { useGetCaregiverNameList } from "@/features/member/useGetCaregiverNameLi
 import { useGetPatientNameList } from "@/features/member/useGetPatientNameList";
 
 import { ScheduleForm } from "@/components/schedules/schedule-form";
+import { useCreateWorkSchedule } from "@/features/workschedule/useCreateWorkSchedule";
 
 export default function NewSchedulePage() {
   const {
@@ -13,6 +14,7 @@ export default function NewSchedulePage() {
   } = useGetCaregiverNameList();
   const { patientNameList, isPatientNameListLoading, errorPatientNameList } =
     useGetPatientNameList();
+  const { createWorkSchedule, isLoading, error } = useCreateWorkSchedule();
 
   if (isCaregiverNameListLoading || isPatientNameListLoading) {
     console.log("errorCaregiverNameList", errorCaregiverNameList);
@@ -25,6 +27,9 @@ export default function NewSchedulePage() {
       mode="create"
       caregiverNameList={caregiverNameList?.caregivers || []}
       patientNameList={patientNameList?.patients || []}
+      isLoading={isLoading}
+      error={error}
+      onClickCreateWorkScheduleButton={(value) => createWorkSchedule(value)}
     />
   );
 }

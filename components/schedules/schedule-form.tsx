@@ -29,24 +29,21 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Link from "next/link";
-import { CaregiverNameListItem, PatientNameListItem } from "@/lib/types/member";
+import {
+  CaregiverNameListItem,
+  PatientNameListItem,
+  WorkScheduleRequest,
+} from "@/lib/types/member";
+import { ErrorMessage } from "@/lib/types/api";
 
 interface ScheduleFormProps {
   mode: "create" | "edit";
   caregiverNameList: CaregiverNameListItem[];
   patientNameList: PatientNameListItem[];
-  initialData?: {
-    caregiverId: string;
-    patientId: string;
-    startDate: Date;
-    endDate: Date;
-    startTime: string;
-    endTime: string;
-    days: string[];
-    hourlyRate: string;
-    salaryType: string;
-    isFamily: boolean;
-  };
+  initialData?: WorkScheduleRequest;
+  isLoading: boolean;
+  error: ErrorMessage;
+  onClickCreateWorkScheduleButton: (args: WorkScheduleRequest) => void;
 }
 
 export function ScheduleForm({
@@ -54,36 +51,41 @@ export function ScheduleForm({
   caregiverNameList,
   patientNameList,
   initialData = {
-    caregiverId: "",
-    patientId: "",
+    caregiverId: null,
+    patientName: "",
+    patientId: null,
     startDate: new Date(),
     endDate: new Date(new Date().setMonth(new Date().getMonth() + 3)),
     startTime: "09:00",
     endTime: "12:00",
     days: [],
-    hourlyRate: "10000",
-    salaryType: "방문급여",
+    workDay: 0,
+    paymentForHour: 0,
+    paymentType: "방문급여",
     isFamily: false,
   },
+  onClickCreateWorkScheduleButton,
 }: ScheduleFormProps) {
-  const [formData, setFormData] = useState(initialData);
+  const [formData, setFormData] = useState<WorkScheduleRequest>(initialData);
 
   const weekdays = [
-    { value: "월", label: "월요일" },
-    { value: "화", label: "화요일" },
-    { value: "수", label: "수요일" },
-    { value: "목", label: "목요일" },
-    { value: "금", label: "금요일" },
-    { value: "토", label: "토요일" },
-    { value: "일", label: "일요일" },
+    { value: 1 << 0, label: "월요일" },
+    { value: 1 << 1, label: "화요일" },
+    { value: 1 << 2, label: "수요일" },
+    { value: 1 << 3, label: "목요일" },
+    { value: 1 << 4, label: "금요일" },
+    { value: 1 << 5, label: "토요일" },
+    { value: 1 << 6, label: "일요일" },
   ];
 
-  const handleDayToggle = (day: string) => {
+  const handleDayToggle = (day: number) => {
     setFormData((prev) => {
-      if (prev.days.includes(day)) {
-        return { ...prev, days: prev.days.filter((d) => d !== day) };
+      const prevDays = prev.days || [];
+
+      if (prevDays.includes(day)) {
+        return { ...prev, days: prevDays.filter((d) => d !== day) };
       } else {
-        return { ...prev, days: [...prev.days, day] };
+        return { ...prev, days: [...prevDays, day] };
       }
     });
   };
@@ -94,7 +96,18 @@ export function ScheduleForm({
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      const data = { ...prev, [name]: value };
+
+      // TODO : 왜 필요한지 모르겠지만 patientName 따로 넣어주기 ..
+      if (name === "patientId") {
+        data.patientName =
+          patientNameList.find((item) => item.patientId === Number(value))
+            ?.patientName || "";
+      }
+
+      return data;
+    });
   };
 
   const handleFamilyChange = (value: string) => {
@@ -103,7 +116,16 @@ export function ScheduleForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitting schedule:", formData);
+
+    const data = {
+      ...formData,
+      caregiverId: Number(formData.caregiverId),
+      patientId: Number(formData.patientId),
+      paymentForHour: Number(formData.paymentForHour),
+      workDay: formData.days?.reduce((prev, curr) => prev + curr, 0) || 0,
+    };
+
+    onClickCreateWorkScheduleButton(data);
   };
 
   const title = mode === "create" ? "근무 일정 등록" : "근무 일정 수정";
@@ -139,7 +161,11 @@ export function ScheduleForm({
                 요양보호사
               </Label>
               <Select
-                value={formData.caregiverId}
+                value={
+                  formData.caregiverId === null
+                    ? undefined
+                    : String(formData.caregiverId)
+                }
                 onValueChange={(value) =>
                   handleSelectChange("caregiverId", value)
                 }
@@ -166,7 +192,11 @@ export function ScheduleForm({
                 보호대상자
               </Label>
               <Select
-                value={formData.patientId}
+                value={
+                  formData.patientId === null
+                    ? undefined
+                    : String(formData.patientId)
+                }
                 onValueChange={(value) =>
                   handleSelectChange("patientId", value)
                 }
@@ -365,7 +395,7 @@ export function ScheduleForm({
                   <div key={day.value} className="flex items-center space-x-2">
                     <Checkbox
                       id={`day-${day.value}`}
-                      checked={formData.days.includes(day.value)}
+                      checked={formData.days?.includes(day.value)}
                       onCheckedChange={() => handleDayToggle(day.value)}
                       className="w-6 h-6"
                     />
@@ -381,13 +411,13 @@ export function ScheduleForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="salaryType" className="text-lg">
+              <Label htmlFor="paymentType" className="text-lg">
                 급여종류
               </Label>
               <Select
-                value={formData.salaryType}
+                value={formData.paymentType}
                 onValueChange={(value) =>
-                  handleSelectChange("salaryType", value)
+                  handleSelectChange("paymentType", value)
                 }
               >
                 <SelectTrigger className="text-lg h-14">
@@ -417,14 +447,14 @@ export function ScheduleForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="hourlyRate" className="text-lg">
+              <Label htmlFor="paymentForHour" className="text-lg">
                 시간당 급여 (원)
               </Label>
               <Input
-                id="hourlyRate"
-                name="hourlyRate"
+                id="paymentForHour"
+                name="paymentForHour"
                 type="number"
-                value={formData.hourlyRate}
+                value={formData.paymentForHour}
                 onChange={handleInputChange}
                 className="text-lg h-14"
                 min="0"

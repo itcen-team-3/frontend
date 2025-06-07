@@ -170,9 +170,9 @@ interface PatientNameListResponse {
 
 // caregiver-patient schedule create
 interface WorkScheduleRequest {
-  patientId: number;
+  patientId: number | null;
   patientName: string;
-  caregiverId: number;
+  caregiverId: number | null;
   startDate: Date | undefined;
   endDate: Date | undefined;
   startTime: string;
@@ -181,6 +181,7 @@ interface WorkScheduleRequest {
   workDay: number;
   paymentType: string;
   isFamily: boolean;
+  days?: number[];
 }
 
 export {
