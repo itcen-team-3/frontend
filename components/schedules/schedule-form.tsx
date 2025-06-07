@@ -29,17 +29,12 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Link from "next/link";
-import { CaregiverNameListItem } from "@/lib/types/member";
-
-interface Patient {
-  id: string;
-  name: string;
-}
+import { CaregiverNameListItem, PatientNameListItem } from "@/lib/types/member";
 
 interface ScheduleFormProps {
   mode: "create" | "edit";
   caregiverNameList: CaregiverNameListItem[];
-  patients?: Patient[];
+  patientNameList: PatientNameListItem[];
   initialData?: {
     caregiverId: string;
     patientId: string;
@@ -57,11 +52,7 @@ interface ScheduleFormProps {
 export function ScheduleForm({
   mode = "create",
   caregiverNameList,
-  patients = [
-    { id: "1", name: "이환자" },
-    { id: "2", name: "최환자" },
-    { id: "3", name: "강환자" },
-  ],
+  patientNameList,
   initialData = {
     caregiverId: "",
     patientId: "",
@@ -184,13 +175,13 @@ export function ScheduleForm({
                   <SelectValue placeholder="보호대상자를 선택하세요" />
                 </SelectTrigger>
                 <SelectContent>
-                  {patients.map((patient) => (
+                  {patientNameList.map((patient) => (
                     <SelectItem
-                      key={patient.id}
-                      value={patient.id}
+                      key={patient.patientId}
+                      value={String(patient.patientId)}
                       className="text-lg"
                     >
-                      {patient.name}
+                      {patient.patientName}
                     </SelectItem>
                   ))}
                 </SelectContent>

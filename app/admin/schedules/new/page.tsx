@@ -1,6 +1,7 @@
 "use client";
 import Loading from "@/components/ui/loading-page";
 import { useGetCaregiverNameList } from "@/features/member/useGetCaregiverNameList";
+import { useGetPatientNameList } from "@/features/member/useGetPatientNameList";
 
 import { ScheduleForm } from "@/components/schedules/schedule-form";
 
@@ -10,9 +11,12 @@ export default function NewSchedulePage() {
     isCaregiverNameListLoading,
     errorCaregiverNameList,
   } = useGetCaregiverNameList();
+  const { patientNameList, isPatientNameListLoading, errorPatientNameList } =
+    useGetPatientNameList();
 
-  if (isCaregiverNameListLoading) {
+  if (isCaregiverNameListLoading || isPatientNameListLoading) {
     console.log("errorCaregiverNameList", errorCaregiverNameList);
+    console.log("errorPatientNameList", errorPatientNameList);
     return <Loading />;
   }
 
@@ -20,6 +24,7 @@ export default function NewSchedulePage() {
     <ScheduleForm
       mode="create"
       caregiverNameList={caregiverNameList?.caregivers || []}
+      patientNameList={patientNameList?.patients || []}
     />
   );
 }
