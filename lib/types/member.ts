@@ -158,6 +158,7 @@ interface CaregiverNameListResponse {
   caregivers: CaregiverNameListItem[];
 }
 
+// patient name list
 interface PatientNameListItem {
   patientId: number;
   patientName: string;
@@ -165,6 +166,21 @@ interface PatientNameListItem {
 
 interface PatientNameListResponse {
   patients: PatientNameListItem[];
+}
+
+// caregiver-patient schedule create
+interface WorkScheduleRequest {
+  patientId: number;
+  patientName: string;
+  caregiverId: number;
+  startDate: Date | undefined;
+  endDate: Date | undefined;
+  startTime: string;
+  endTime: string;
+  paymentForHour: number;
+  workDay: number;
+  paymentType: string;
+  isFamily: boolean;
 }
 
 export {
@@ -187,4 +203,5 @@ export {
   type CaregiverNameListResponse,
   type PatientNameListItem,
   type PatientNameListResponse,
+  type WorkScheduleRequest,
 };
