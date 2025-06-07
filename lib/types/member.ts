@@ -93,6 +93,7 @@ interface CaregiverDetailResponse {
 
 // patient create
 interface PatientInfoRequest {
+  patientId?: number;
   name: string;
   birthDate: Date | undefined;
   address: string;
