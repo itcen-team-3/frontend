@@ -33,12 +33,17 @@ interface PatientListProps {
   pageSize: number;
   totalElements: number;
   totalPages: number;
+  deletePatient: (id: number | null) => void;
+  isDeleting: boolean;
+  errorDeletePatient: ErrorMessage;
 }
 
 export function PatientList({
   isLoading,
+  refetchGetPatients,
   onClickSearchButton,
   content,
+  deletePatient,
 }: PatientListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -55,9 +60,9 @@ export function PatientList({
     setDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    // 실제 구현에서는 여기서 삭제 API를 호출합니다
-    console.log(`Deleting patient with ID: ${selectedPatientId}`);
+  const handleDeleteConfirm = async () => {
+    await deletePatient(selectedPatientId);
+    await refetchGetPatients(searchTerm);
     setDeleteDialogOpen(false);
   };
 
