@@ -17,59 +17,40 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-interface Patient {
-  id: string;
-  name: string;
-  age: number;
-  address: string;
-  imageUrl?: string;
-  caregiverName?: string;
-}
+import { PatientListItem } from "@/lib/types/member";
+import { ErrorMessage } from "@/lib/types/api";
+import Loading from "../ui/loading-page";
 
 interface PatientListProps {
-  patients: Patient[];
+  isLoading: boolean;
+  errorGetPatients: ErrorMessage;
+  refetchGetPatients: (args: string) => void;
+  onClickSearchButton: (args: string) => void;
+  content: PatientListItem[];
+  first: boolean;
+  last: boolean;
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
 }
 
 export function PatientList({
-  patients = [
-    {
-      id: "1",
-      name: "이환자",
-      age: 78,
-      address: "서울시 강남구",
-      imageUrl: "/elderly-woman-knitting.png",
-      caregiverName: "김요양",
-    },
-    {
-      id: "2",
-      name: "최환자",
-      age: 82,
-      address: "서울시 서초구",
-      imageUrl: "/elderly-man-contemplative.png",
-      caregiverName: "박요양",
-    },
-    {
-      id: "3",
-      name: "강환자",
-      age: 75,
-      address: "서울시 송파구",
-      imageUrl: "/elderly-woman-knitting.png",
-      caregiverName: "정요양",
-    },
-  ],
+  isLoading,
+  onClickSearchButton,
+  content,
 }: PatientListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
-    null,
+  const [selectedPatientId, setSelectedPatientId] = useState<number | null>(
+    null
   );
 
-  const filteredPatients = patients.filter((patient) =>
-    patient.name.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  if (isLoading) {
+    return <Loading />;
+  }
 
-  const handleDeleteClick = (id: string) => {
+  const handleDeleteClick = (id: number) => {
     setSelectedPatientId(id);
     setDeleteDialogOpen(true);
   };
@@ -100,28 +81,37 @@ export function PatientList({
           <div className="flex justify-between items-center">
             <CardTitle className="text-xl">보호대상자 목록</CardTitle>
             <div className="relative w-64">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+              <Search
+                className="absolute left-3 top-3 h-5 w-5 text-muted-foreground"
+                onClick={() => onClickSearchButton(searchTerm)}
+              />
               <Input
                 placeholder="이름으로 검색"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 h-12 text-lg"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    onClickSearchButton(searchTerm);
+                  }
+                }}
               />
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {filteredPatients.length > 0 ? (
-              filteredPatients.map((patient) => (
+            {content.length > 0 ? (
+              content.map((patient) => (
                 <div
-                  key={patient.id}
+                  key={patient.patientId}
                   className="flex items-center justify-between p-4 border rounded-lg"
                 >
                   <div className="flex items-center gap-4">
                     <Avatar>
+                      {/* TODO : patient.imageUrl 추가 */}
                       <AvatarImage
-                        src={patient.imageUrl || "/placeholder.svg"}
+                        src={"/placeholder.svg"}
                         alt={patient.name}
                       />
                       <AvatarFallback>{patient.name[0]}</AvatarFallback>
@@ -130,20 +120,20 @@ export function PatientList({
                       <h3 className="text-lg font-medium">
                         {patient.name} ({patient.age}세)
                       </h3>
-                      <p className="text-sm text-muted-foreground">
+                      {/* <p className="text-sm text-muted-foreground">
                         {patient.caregiverName
                           ? `담당: ${patient.caregiverName}`
                           : "담당자 미지정"}
-                      </p>
+                      </p> */}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Link href={`/admin/patients/${patient.id}`}>
+                    <Link href={`/admin/patients/${patient.patientId}`}>
                       <Button variant="outline" size="icon">
                         <User className="h-5 w-5" />
                       </Button>
                     </Link>
-                    <Link href={`/admin/patients/${patient.id}/edit`}>
+                    <Link href={`/admin/patients/${patient.patientId}/edit`}>
                       <Button variant="outline" size="icon">
                         <Edit className="h-5 w-5" />
                       </Button>
@@ -151,7 +141,7 @@ export function PatientList({
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => handleDeleteClick(patient.id)}
+                      onClick={() => handleDeleteClick(patient.patientId)}
                     >
                       <Trash2 className="h-5 w-5" />
                     </Button>
