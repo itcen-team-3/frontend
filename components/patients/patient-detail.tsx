@@ -3,54 +3,15 @@ import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Calendar, Edit, MapPin, Phone, User } from "lucide-react";
+import { ArrowLeft, Edit, MapPin, Phone, User } from "lucide-react";
 import Link from "next/link";
-
-interface PatientSchedule {
-  id: string;
-  caregiverName: string;
-  days: string[];
-  time: string;
-}
+import { PatientDetailResponse } from "@/lib/types/member";
 
 interface PatientDetailProps {
-  id: string;
-  name: string;
-  age: number;
-  address: string;
-  phone: string;
-  medicalNotes: string;
-  familyContact: string;
-  guardianName: string;
-  imageUrl?: string;
-  schedules: PatientSchedule[];
+  data: PatientDetailResponse;
 }
 
-export function PatientDetail({
-  id = "1",
-  name = "이환자",
-  age = 78,
-  address = "서울시 강남구",
-  phone = "010-1234-5678",
-  medicalNotes = "고혈압 약 복용 중, 거동이 불편하여 휠체어 사용",
-  familyContact = "010-9876-5432 (아들)",
-  guardianName = "이보호",
-  imageUrl = "/elderly-woman-knitting.png",
-  schedules = [
-    {
-      id: "1",
-      caregiverName: "김요양",
-      days: ["월", "수", "금"],
-      time: "09:00 - 12:00",
-    },
-    {
-      id: "2",
-      caregiverName: "박요양",
-      days: ["화", "목"],
-      time: "14:00 - 17:00",
-    },
-  ],
-}: PatientDetailProps) {
+export function PatientDetail({ data }: PatientDetailProps) {
   return (
     <PageContainer>
       <div className="flex items-center mb-6">
@@ -64,7 +25,7 @@ export function PatientDetail({
           description="보호대상자 상세 정보"
           className="mb-0 flex-1"
         />
-        <Link href={`/admin/patients/${id}/edit`}>
+        <Link href={`/admin/patients/${data.patientId}/edit`}>
           <Button variant="outline" size="lg">
             <Edit className="mr-2 h-5 w-5" />
             정보 수정
@@ -79,28 +40,33 @@ export function PatientDetail({
           </CardHeader>
           <CardContent className="flex flex-col items-center text-center">
             <Avatar className="w-32 h-32 mb-4">
-              <AvatarImage src={imageUrl || "/placeholder.svg"} alt={name} />
-              <AvatarFallback className="text-4xl">{name[0]}</AvatarFallback>
+              <AvatarImage
+                src={data.profileImage || "/placeholder.svg"}
+                alt={data.name}
+              />
+              <AvatarFallback className="text-4xl">
+                {data.name[0]}
+              </AvatarFallback>
             </Avatar>
-            <h2 className="text-2xl font-bold mb-1">{name}</h2>
-            <p className="text-lg text-muted-foreground mb-4">{age}세</p>
+            <h2 className="text-2xl font-bold mb-1">{data.name}</h2>
+            <p className="text-lg text-muted-foreground mb-4">{data.age}세</p>
 
             <div className="w-full space-y-3">
               <div className="flex items-center p-3 border rounded-lg">
                 <Phone className="h-5 w-5 mr-3 text-muted-foreground" />
-                <span className="text-lg">{phone}</span>
+                <span className="text-lg">{data.phoneNumber}</span>
               </div>
               <div className="flex items-center p-3 border rounded-lg">
                 <MapPin className="h-5 w-5 mr-3 text-muted-foreground" />
-                <span className="text-lg">{address}</span>
+                <span className="text-lg">{data.address}</span>
               </div>
               <div className="flex items-center p-3 border rounded-lg">
                 <User className="h-5 w-5 mr-3 text-muted-foreground" />
-                <span className="text-lg">{familyContact}</span>
+                <span className="text-lg">{data.guardianPhoneNumber}</span>
               </div>
               <div className="flex items-center p-3 border rounded-lg">
                 <User className="h-5 w-5 mr-3 text-muted-foreground" />
-                <span className="text-lg">{guardianName} (보호자)</span>
+                <span className="text-lg">{data.guardianName} (보호자)</span>
               </div>
             </div>
           </CardContent>
@@ -112,7 +78,7 @@ export function PatientDetail({
           </CardHeader>
           <CardContent>
             <div className="p-4 border rounded-lg">
-              <p className="text-lg">{medicalNotes}</p>
+              <p className="text-lg">{data.description}</p>
             </div>
           </CardContent>
         </Card>
@@ -122,15 +88,16 @@ export function PatientDetail({
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle className="text-xl">돌봄 일정</CardTitle>
-            <Link href={`/admin/schedules/patient/${id}`}>
+            <Link href={`/admin/schedules/patient/${data.patientId}`}>
               <Button variant="outline">일정 관리</Button>
             </Link>
           </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {schedules.length > 0 ? (
-              schedules.map((schedule) => (
+            {/* TODO : 데이터 테스트 필요 */}
+            {/* {data.schedules.length > 0 ? (
+              data.schedules.map((schedule) => (
                 <div key={schedule.id} className="p-4 border rounded-lg">
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="text-lg font-medium">
@@ -157,7 +124,7 @@ export function PatientDetail({
               <p className="text-center text-muted-foreground py-8">
                 등록된 돌봄 일정이 없습니다
               </p>
-            )}
+            )} */}
           </div>
         </CardContent>
       </Card>

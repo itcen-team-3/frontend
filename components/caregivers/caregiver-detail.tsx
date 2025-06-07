@@ -98,6 +98,7 @@ export function CaregiverDetail({ data }: CaregiverDetailProps) {
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    {/* TODO : 데이터 테스트 필요 */}
                     {/* {schedule.days.map((day) => (
                       <span
                         key={day}
