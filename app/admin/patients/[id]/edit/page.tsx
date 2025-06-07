@@ -1,19 +1,17 @@
+"use client";
+
 import { PatientForm } from "@/components/patients/patient-form";
+import { useGetPatientForUpdate } from "@/features/member/useGetPatientForUpdate";
+import { useParams } from "next/navigation";
+import Loading from "@/components/ui/loading-page";
 
 export default function EditPatientPage() {
-  // 실제 구현에서는 ID를 기반으로 데이터를 가져옵니다
-  const mockData = {
-    name: "이환자",
-    birthDate: new Date(1945, 2, 15), // 1945년 3월 15일
-    address: "서울시 강남구",
-    phone: "010-1234-5678",
-    medicalNotes: "고혈압 약 복용 중, 거동이 불편하여 휠체어 사용",
-    familyContact: "010-9876-5432",
-    familyRelation: "son",
-    guardianName: "이보호",
-    imageUrl: "/elderly-woman-knitting.png",
-    careGrade: "3",
-  };
+  const { id } = useParams() as { id?: string };
+  const { data } = useGetPatientForUpdate(id);
 
-  return <PatientForm mode="edit" initialData={mockData} />;
+  if (!data) {
+    return <Loading />;
+  }
+
+  return <PatientForm mode="edit" initialData={data} />;
 }
