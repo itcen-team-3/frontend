@@ -29,11 +29,7 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Link from "next/link";
-
-interface Caregiver {
-  id: string;
-  name: string;
-}
+import { CaregiverNameListItem } from "@/lib/types/member";
 
 interface Patient {
   id: string;
@@ -42,7 +38,7 @@ interface Patient {
 
 interface ScheduleFormProps {
   mode: "create" | "edit";
-  caregivers?: Caregiver[];
+  caregiverNameList: CaregiverNameListItem[];
   patients?: Patient[];
   initialData?: {
     caregiverId: string;
@@ -60,11 +56,7 @@ interface ScheduleFormProps {
 
 export function ScheduleForm({
   mode = "create",
-  caregivers = [
-    { id: "1", name: "김요양" },
-    { id: "2", name: "박요양" },
-    { id: "3", name: "정요양" },
-  ],
+  caregiverNameList,
   patients = [
     { id: "1", name: "이환자" },
     { id: "2", name: "최환자" },
@@ -165,13 +157,13 @@ export function ScheduleForm({
                   <SelectValue placeholder="요양보호사를 선택하세요" />
                 </SelectTrigger>
                 <SelectContent>
-                  {caregivers.map((caregiver) => (
+                  {caregiverNameList.map((caregiver) => (
                     <SelectItem
-                      key={caregiver.id}
-                      value={caregiver.id}
+                      key={caregiver.caregiverId}
+                      value={String(caregiver.caregiverId)}
                       className="text-lg"
                     >
-                      {caregiver.name}
+                      {caregiver.caregiverName}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -258,7 +250,7 @@ export function ScheduleForm({
                       variant="outline"
                       className={cn(
                         "w-full justify-start text-left text-lg font-normal h-14",
-                        !formData.startDate && "text-muted-foreground",
+                        !formData.startDate && "text-muted-foreground"
                       )}
                     >
                       <CalendarIcon className="mr-2 h-5 w-5" />
@@ -306,7 +298,7 @@ export function ScheduleForm({
                       variant="outline"
                       className={cn(
                         "w-full justify-start text-left text-lg font-normal h-14",
-                        !formData.endDate && "text-muted-foreground",
+                        !formData.endDate && "text-muted-foreground"
                       )}
                     >
                       <CalendarIcon className="mr-2 h-5 w-5" />
