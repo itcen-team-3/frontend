@@ -3,11 +3,14 @@
 import { useState } from "react";
 import { PatientList } from "@/components/patients/patient-list";
 import { useGetPatients } from "@/features/member/useGetPatients";
+import { useDeletePatient } from "@/features/member/useDeletePatient";
 
 export default function PatientsPage() {
   const [searchName, setSearchName] = useState("");
   const { data, isLoading, errorGetPatients, refetchGetPatients } =
     useGetPatients(searchName);
+
+  const { deletePatient, isDeleting, errorDeletePatient } = useDeletePatient();
 
   const onClickSearchButton = (word: string) => {
     setSearchName(word);
@@ -26,6 +29,9 @@ export default function PatientsPage() {
       pageSize={data?.pageSize || 10}
       totalElements={data?.totalElements || 0}
       totalPages={data?.totalPages || 10}
+      deletePatient={deletePatient}
+      isDeleting={isDeleting}
+      errorDeletePatient={errorDeletePatient}
     />
   );
 }
