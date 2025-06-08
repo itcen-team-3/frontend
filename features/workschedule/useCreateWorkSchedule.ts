@@ -4,6 +4,7 @@ import { useState } from "react";
 import { api } from "@/lib/http";
 import { useRouter } from "next/navigation";
 import type { WorkScheduleRequest } from "@/lib/types/member";
+import { format } from "date-fns";
 
 export const useCreateWorkSchedule = () => {
   const router = useRouter();
@@ -48,8 +49,8 @@ export const useCreateWorkSchedule = () => {
       body.patientId = data.patientId;
       body.patientName = data.patientName;
       body.caregiverId = data.caregiverId;
-      body.startDate = data.startDate?.toISOString()?.split("T")[0];
-      body.endDate = data.endDate?.toISOString()?.split("T")[0];
+      body.startDate = format(data.startDate || "", "yyyy-MM-dd");
+      body.endDate = format(data.endDate || "", "yyyy-MM-dd");
       body.startTime = data.startTime + ":00";
       body.endTime = data.endTime + ":00";
       body.paymentForHour = data.paymentForHour;

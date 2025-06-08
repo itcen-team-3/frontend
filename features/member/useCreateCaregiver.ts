@@ -4,6 +4,7 @@ import { useState } from "react";
 import { api } from "@/lib/http";
 import { useRouter } from "next/navigation";
 import type { CaregiverInfoRequest } from "@/lib/types/member";
+import { format } from "date-fns";
 
 export const useCreateCaregiver = () => {
   const router = useRouter();
@@ -22,10 +23,7 @@ export const useCreateCaregiver = () => {
       const formData = new FormData();
       formData.append("name", data.name);
       // TODO 생일 변환 로직 빼고 테스트해보기
-      formData.append(
-        "birthDate",
-        data.birthDate?.toISOString()?.split("T")[0] || ""
-      );
+      formData.append("birthDate", format(data.birthDate || "", "yyyy-MM-dd"));
       formData.append("phoneNumber", data.phoneNumber);
       formData.append("address", data.address);
       formData.append("certificateNumber", data.certificateNumber);
