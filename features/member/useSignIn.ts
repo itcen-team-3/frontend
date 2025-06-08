@@ -40,8 +40,6 @@ export const useSignIn = () => {
       }
 
       localStorage.setItem("access-token", res.data.accessToken);
-      // TODO : companyId 받아서 주입할 것 임시 코드
-      localStorage.setItem("company-id", "5");
 
       if (type === "admin") {
         router.push("/admin/dashboard");

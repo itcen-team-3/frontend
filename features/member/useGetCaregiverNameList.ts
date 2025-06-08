@@ -18,7 +18,6 @@ export const useGetCaregiverNameList = () => {
 
   useEffect(() => {
     const fetchCaregiverNameList = async () => {
-      const companyId = localStorage.getItem("company-id");
       setIsCaregiverNameListLoading(true);
       setErrorCaregiverNameList({
         code: 0,
@@ -27,7 +26,7 @@ export const useGetCaregiverNameList = () => {
 
       try {
         const res = await api.get<CaregiverNameListResponse>(
-          `/member/caregiver-name-list/${companyId}`
+          "/member/caregiver-name-list"
         );
         setCaregiverNameList(res.data);
       } catch (e: any) {
