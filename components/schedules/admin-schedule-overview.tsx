@@ -26,10 +26,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { CaregiverNameListItem } from "@/lib/types/member";
+import { WorkScheduleItem } from "@/lib/types/workSchedule";
 
 interface Caregiver {
-  id: string;
-  name: string;
+  caregiverId: string;
+  caregiverName: string;
   imageUrl?: string;
 }
 
@@ -39,28 +41,41 @@ interface Patient {
   address: string;
 }
 
-interface ScheduleEvent {
-  id: string;
-  caregiverId: string;
-  patientId: string;
-  date: Date;
-  startTime: string;
-  endTime: string;
-}
-
 interface AdminScheduleOverviewProps {
   caregivers: Caregiver[];
   patients: Patient[];
-  scheduleEvents: ScheduleEvent[];
+  scheduleEvents: WorkScheduleItem[];
+  caregiverNameList: CaregiverNameListItem[];
+  refetchGetWorkSchedulesByWeek: (args: string) => void;
 }
 
 export function AdminScheduleOverview({
   caregivers = [
-    { id: "1", name: "김요양", imageUrl: "/diverse-woman-portrait.png" },
-    { id: "2", name: "박요양", imageUrl: "/thoughtful-man.png" },
-    { id: "3", name: "정요양", imageUrl: "/diverse-woman-portrait.png" },
-    { id: "4", name: "최요양", imageUrl: "/thoughtful-man.png" },
-    { id: "5", name: "이요양", imageUrl: "/diverse-woman-portrait.png" },
+    {
+      caregiverId: "1",
+      caregiverName: "김요양",
+      imageUrl: "/diverse-woman-portrait.png",
+    },
+    {
+      caregiverId: "2",
+      caregiverName: "박요양",
+      imageUrl: "/thoughtful-man.png",
+    },
+    {
+      caregiverId: "3",
+      caregiverName: "정요양",
+      imageUrl: "/diverse-woman-portrait.png",
+    },
+    {
+      caregiverId: "4",
+      caregiverName: "최요양",
+      imageUrl: "/thoughtful-man.png",
+    },
+    {
+      caregiverId: "5",
+      caregiverName: "이요양",
+      imageUrl: "/diverse-woman-portrait.png",
+    },
   ],
   patients = [
     { id: "1", name: "이환자", address: "서울시 강남구" },
@@ -71,78 +86,89 @@ export function AdminScheduleOverview({
   ],
   scheduleEvents = [
     {
-      id: "1",
-      caregiverId: "1",
-      patientId: "1",
-      date: new Date(2025, 4, 20), // 2025-05-20
+      scheduleId: 1,
+      caregiverId: 1,
+      patientId: 1,
+      scheduleDate: new Date(2025, 5, 2), // 2025-06-02
       startTime: "09:00",
       endTime: "12:00",
+      patientName: "이환자",
     },
     {
-      id: "2",
-      caregiverId: "1",
-      patientId: "1",
-      date: new Date(2025, 4, 22), // 2025-05-22
+      scheduleId: 2,
+      caregiverId: 1,
+      patientId: 1,
+      scheduleDate: new Date(2025, 5, 5), // 2025-06-05
       startTime: "09:00",
       endTime: "12:00",
+      patientName: "박환자",
     },
     {
-      id: "3",
-      caregiverId: "1",
-      patientId: "1",
-      date: new Date(2025, 4, 24), // 2025-05-24
+      scheduleId: 3,
+      caregiverId: 1,
+      patientId: 1,
+      scheduleDate: new Date(2025, 5, 3), // 2025-06-03
       startTime: "09:00",
       endTime: "12:00",
+      patientName: "김환자",
     },
     {
-      id: "4",
-      caregiverId: "2",
-      patientId: "2",
-      date: new Date(2025, 4, 21), // 2025-05-21
+      scheduleId: 4,
+      caregiverId: 2,
+      patientId: 2,
+      scheduleDate: new Date(2025, 5, 8), // 2025-06-08
       startTime: "14:00",
       endTime: "17:00",
+      patientName: "이환자",
     },
     {
-      id: "5",
-      caregiverId: "2",
-      patientId: "2",
-      date: new Date(2025, 4, 23), // 2025-05-23
+      scheduleId: 5,
+      caregiverId: 2,
+      patientId: 2,
+      scheduleDate: new Date(2025, 5, 5), // 2025-06-05
       startTime: "14:00",
       endTime: "17:00",
+      patientName: "박환자",
     },
     {
-      id: "6",
-      caregiverId: "3",
-      patientId: "3",
-      date: new Date(2025, 4, 20), // 2025-05-20
+      scheduleId: 6,
+      caregiverId: 3,
+      patientId: 3,
+      scheduleDate: new Date(2025, 5, 3), // 2025-06-03
       startTime: "10:00",
       endTime: "13:00",
+      patientName: "조환자",
     },
     {
-      id: "7",
-      caregiverId: "3",
-      patientId: "3",
-      date: new Date(2025, 4, 21), // 2025-05-21
+      scheduleId: 7,
+      caregiverId: 3,
+      patientId: 3,
+      scheduleDate: new Date(2025, 5, 4), // 2025-06-04
       startTime: "10:00",
       endTime: "13:00",
+      patientName: "이환자",
     },
     {
-      id: "8",
-      caregiverId: "4",
-      patientId: "4",
-      date: new Date(2025, 4, 22), // 2025-05-22
+      scheduleId: 8,
+      caregiverId: 4,
+      patientId: 4,
+      scheduleDate: new Date(2025, 5, 4), // 2025-06-04
       startTime: "13:00",
       endTime: "16:00",
+      patientName: "박환자",
     },
     {
-      id: "9",
-      caregiverId: "5",
-      patientId: "5",
-      date: new Date(2025, 4, 23), // 2025-05-23
+      scheduleId: 9,
+      caregiverId: 5,
+      patientId: 5,
+      scheduleDate: new Date(2025, 5, 8), // 2025-06-08
       startTime: "09:00",
       endTime: "12:00",
+      patientName: "조환자",
     },
   ],
+  caregiverNameList,
+  refetchGetWorkSchedulesByWeek,
 }: AdminScheduleOverviewProps) {
   // const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(
@@ -151,7 +177,7 @@ export function AdminScheduleOverview({
   const [selectedEventDetails, setSelectedEventDetails] = useState<{
     caregiver: Caregiver;
     patient: Patient;
-    event: ScheduleEvent;
+    event: WorkScheduleItem;
   } | null>(null);
 
   // 현재 주의 날짜들
@@ -160,33 +186,39 @@ export function AdminScheduleOverview({
     end: endOfWeek(currentWeekStart, { weekStartsOn: 1 }),
   });
 
-  // 필터링된 요양보호사 - 모든 요양보호사 표시
-  const filteredCaregivers = caregivers;
-
   // 필터링된 스케줄 이벤트 - 모든 이벤트 표시
   const filteredEvents = scheduleEvents;
 
   // 날짜별 이벤트 그룹화
   const eventsByDate = filteredEvents.reduce(
     (acc, event) => {
-      const dateStr = format(event.date, "yyyy-MM-dd");
+      const dateStr = format(
+        !event.scheduleDate ? "" : event.scheduleDate,
+        "yyyy-MM-dd"
+      );
       if (!acc[dateStr]) {
         acc[dateStr] = [];
       }
       acc[dateStr].push(event);
       return acc;
     },
-    {} as Record<string, ScheduleEvent[]>
+    {} as Record<string, WorkScheduleItem[]>
   );
 
   // 이전 주로 이동
   const goToPreviousWeek = () => {
-    setCurrentWeekStart(addDays(currentWeekStart, -7));
+    const date = addDays(currentWeekStart, -7);
+    const dateString = format(date, "yyyy-MM-dd");
+    setCurrentWeekStart(date);
+    refetchGetWorkSchedulesByWeek(dateString);
   };
 
   // 다음 주로 이동
   const goToNextWeek = () => {
-    setCurrentWeekStart(addDays(currentWeekStart, 7));
+    const date = addDays(currentWeekStart, 7);
+    const dateString = format(date, "yyyy-MM-dd");
+    setCurrentWeekStart(date);
+    refetchGetWorkSchedulesByWeek(dateString);
   };
 
   // 날짜에 해당하는 일정 가져오기
@@ -196,8 +228,10 @@ export function AdminScheduleOverview({
   };
 
   // 요양보호사 정보 가져오기
+  // TODO : caregiverNameList 바꾸기
+  console.log("caregiverNameList", caregiverNameList);
   const getCaregiverById = (id: string) => {
-    return caregivers.find((caregiver) => caregiver.id === id);
+    return caregivers.find((caregiver) => caregiver.caregiverId === id);
   };
 
   // 환자 정보 가져오기
@@ -206,9 +240,9 @@ export function AdminScheduleOverview({
   };
 
   // 이벤트 클릭 핸들러
-  const handleEventClick = (event: ScheduleEvent) => {
-    const caregiver = getCaregiverById(event.caregiverId);
-    const patient = getPatientById(event.patientId);
+  const handleEventClick = (event: WorkScheduleItem) => {
+    const caregiver = getCaregiverById(String(event.caregiverId));
+    const patient = getPatientById(String(event.patientId));
 
     if (caregiver && patient) {
       setSelectedEventDetails({
@@ -246,58 +280,62 @@ export function AdminScheduleOverview({
           </div>
         </CardHeader>
         <CardContent>
-          {/* 기존 주간보기 그리드 내용 유지 */}
-          <div className="grid grid-cols-7 gap-2">
-            {currentWeekDays.map((day, index) => (
-              <div key={index} className="text-center">
-                <div
-                  className={cn(
-                    "py-2 font-medium",
-                    isToday(day) &&
-                      "bg-primary text-primary-foreground rounded-md"
-                  )}
-                >
-                  {format(day, "eee", { locale: ko })}
-                  <br />
-                  {format(day, "d")}
-                </div>
+          <div
+            className="grid gap-2"
+            style={{ gridTemplateColumns: "100px repeat(7, 1fr)" }}
+          >
+            {/* 헤더 row (비어 있는 왼쪽 칸 + 요일 7개) */}
+            <div /> {/* 비어있는 왼쪽 위 칸 */}
+            {currentWeekDays.map((day) => (
+              <div
+                key={day.toISOString()}
+                className={cn(
+                  "py-2 font-medium text-center",
+                  isToday(day) &&
+                    "bg-primary text-primary-foreground rounded-md"
+                )}
+              >
+                {format(day, "eee", { locale: ko })}
+                <br />
+                {format(day, "d")}
               </div>
             ))}
+            {/* 요양보호사별 row */}
+            {/* TODO : caregiverNameList 추후 적용 */}
+            {caregivers.map((caregiver) => (
+              <React.Fragment key={caregiver.caregiverId}>
+                {/* 요양보호사 이름 */}
+                <div className="flex items-center space-x-2 p-2">
+                  <Avatar className="h-8 w-8">
+                    {/* TODO : profileImage 내려달라고 할 것 .. */}
+                    {/* caregiver.profileImage */}
+                    <AvatarImage src={"/placeholder.svg"} />
+                    <AvatarFallback>
+                      {caregiver.caregiverName[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-medium">
+                    {caregiver.caregiverName}
+                  </span>
+                </div>
 
-            {/* 요양보호사별 행 */}
-            {filteredCaregivers.map((caregiver) => (
-              <React.Fragment key={caregiver.id}>
+                {/* 요일별 스케줄 */}
                 {currentWeekDays.map((day, dayIndex) => {
                   const dayEvents = getEventsForDay(day).filter(
-                    (event) => event.caregiverId === caregiver.id
+                    (event) =>
+                      String(event.caregiverId) ===
+                      String(caregiver.caregiverId)
                   );
                   return (
                     <div
-                      key={`${caregiver.id}-${dayIndex}`}
-                      className={cn(
-                        "min-h-[80px] border rounded-md p-1 overflow-y-auto",
-                        dayIndex === 0 && "relative"
-                      )}
+                      key={`${caregiver.caregiverId}-${dayIndex}`}
+                      className="min-h-[80px] border rounded-md p-1 overflow-y-auto"
                     >
-                      {dayIndex === 0 && (
-                        <div className="absolute -left-16 top-1/2 transform -translate-y-1/2 flex items-center">
-                          <Avatar className="h-8 w-8 mr-2">
-                            <AvatarImage
-                              src={caregiver.imageUrl || "/placeholder.svg"}
-                              alt={caregiver.name}
-                            />
-                            <AvatarFallback>{caregiver.name[0]}</AvatarFallback>
-                          </Avatar>
-                          <span className="text-sm font-medium">
-                            {caregiver.name}
-                          </span>
-                        </div>
-                      )}
                       {dayEvents.map((event) => {
-                        const patient = getPatientById(event.patientId);
+                        const patient = getPatientById(String(event.patientId));
                         return (
                           <div
-                            key={event.id}
+                            key={event.scheduleId}
                             className="mb-1 p-1 text-xs bg-primary/10 rounded text-primary border border-primary/20 cursor-pointer hover:bg-primary/20"
                             onClick={() => handleEventClick(event)}
                           >
@@ -326,7 +364,7 @@ export function AdminScheduleOverview({
           <DialogHeader>
             <DialogTitle className="text-xl">스케줄 상세 정보</DialogTitle>
             <DialogDescription className="text-lg">
-              {selectedEventDetails?.caregiver.name} 요양보호사 -{" "}
+              {selectedEventDetails?.caregiver.caregiverName} 요양보호사 -{" "}
               {selectedEventDetails?.patient.name} 님
             </DialogDescription>
           </DialogHeader>
@@ -335,9 +373,9 @@ export function AdminScheduleOverview({
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">날짜</p>
                 <p className="text-base font-medium">
-                  {selectedEventDetails?.event.date &&
+                  {selectedEventDetails?.event.scheduleDate &&
                     format(
-                      selectedEventDetails.event.date,
+                      selectedEventDetails.event.scheduleDate,
                       "yyyy년 MM월 dd일 (eee)",
                       { locale: ko }
                     )}
@@ -361,14 +399,14 @@ export function AdminScheduleOverview({
                       selectedEventDetails?.caregiver.imageUrl ||
                       "/placeholder.svg"
                     }
-                    alt={selectedEventDetails?.caregiver.name}
+                    alt={selectedEventDetails?.caregiver.caregiverName}
                   />
                   <AvatarFallback>
-                    {selectedEventDetails?.caregiver.name[0]}
+                    {selectedEventDetails?.caregiver.caregiverName[0]}
                   </AvatarFallback>
                 </Avatar>
                 <p className="text-base font-medium">
-                  {selectedEventDetails?.caregiver.name}
+                  {selectedEventDetails?.caregiver.caregiverName}
                 </p>
               </div>
             </div>
