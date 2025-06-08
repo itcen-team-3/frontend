@@ -4,6 +4,7 @@ import { useState } from "react";
 import { api } from "@/lib/http";
 import { useRouter } from "next/navigation";
 import type { PatientInfoRequest } from "@/lib/types/member";
+import { format } from "date-fns";
 
 export const useEditPatient = () => {
   const router = useRouter();
@@ -27,10 +28,7 @@ export const useEditPatient = () => {
       const formData = new FormData();
       formData.append("name", data.name);
       // TODO 생일 변환 로직 빼고 테스트해보기
-      formData.append(
-        "birthDate",
-        data.birthDate?.toISOString()?.split("T")[0] || ""
-      );
+      formData.append("birthDate", format(data.birthDate || "", "yyyy-MM-dd"));
       formData.append("phoneNumber", data.phoneNumber);
       formData.append("address", data.address);
       formData.append("patientLevel", data.patientLevel);
