@@ -44,7 +44,7 @@ interface RefreshTokenResponse {
 interface CaregiverInfoRequest {
   caregiverId?: number;
   name: string;
-  birthDate: Date | undefined;
+  birthDate: Date | undefined | string;
   phoneNumber: string;
   address: string;
   certificateNumber: string;
@@ -82,7 +82,7 @@ interface CaregiverScheduleItem {
 interface CaregiverDetailResponse {
   caregiverId: number;
   name: string;
-  birthDate: Date | undefined;
+  birthDate: Date | undefined | string;
   age: number;
   phoneNumber: string;
   address: string;
@@ -95,7 +95,7 @@ interface CaregiverDetailResponse {
 interface PatientInfoRequest {
   patientId?: number;
   name: string;
-  birthDate: Date | undefined;
+  birthDate: Date | undefined | string;
   address: string;
   phoneNumber: string;
   patientLevel: string;
@@ -135,7 +135,7 @@ interface PatientScheduleItem {
 interface PatientDetailResponse {
   patientId: number;
   name: string;
-  birthDate: Date | undefined;
+  birthDate: Date | undefined | string;
   age: number;
   address: string;
   phoneNumber: string;
@@ -168,22 +168,6 @@ interface PatientNameListResponse {
   patients: PatientNameListItem[];
 }
 
-// caregiver-patient schedule create
-interface WorkScheduleRequest {
-  patientId: number | null;
-  patientName: string;
-  caregiverId: number | null;
-  startDate: Date | undefined;
-  endDate: Date | undefined;
-  startTime: string;
-  endTime: string;
-  paymentForHour: number;
-  workDay: number;
-  paymentType: string;
-  isFamily: boolean;
-  days?: number[];
-}
-
 export {
   type SignInRequest,
   type SignInResponse,
@@ -204,5 +188,4 @@ export {
   type CaregiverNameListResponse,
   type PatientNameListItem,
   type PatientNameListResponse,
-  type WorkScheduleRequest,
 };

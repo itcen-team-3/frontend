@@ -29,11 +29,8 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Link from "next/link";
-import {
-  CaregiverNameListItem,
-  PatientNameListItem,
-  WorkScheduleRequest,
-} from "@/lib/types/member";
+import { CaregiverNameListItem, PatientNameListItem } from "@/lib/types/member";
+import { WorkScheduleRequest } from "@/lib/types/workSchedule";
 import { ErrorMessage } from "@/lib/types/api";
 
 interface ScheduleFormProps {

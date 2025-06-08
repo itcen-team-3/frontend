@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { api } from "@/lib/http";
 import { useRouter } from "next/navigation";
-import type { WorkScheduleRequest } from "@/lib/types/member";
+import type { WorkScheduleRequest } from "@/lib/types/workSchedule";
 import { format } from "date-fns";
 
 export const useCreateWorkSchedule = () => {
