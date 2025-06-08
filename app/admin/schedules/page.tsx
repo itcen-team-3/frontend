@@ -16,6 +16,10 @@ export default function ScheduleOverviewPage() {
     <AdminScheduleOverview
       caregiverNameList={caregiverNameList?.caregivers || []}
       refetchGetWorkSchedulesByWeek={refetchGetWorkSchedulesByWeek}
+      // TODO : 추후 제거 build 에러 해결용
+      caregivers={[]}
+      patients={[]}
+      scheduleEvents={[]}
     />
   );
 }

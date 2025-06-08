@@ -87,17 +87,17 @@ export function CaregiverRegistrationForm({
     }
   };
 
-  const calculateAge = (birthDate: Date): number => {
-    const today = new Date();
-    const age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
+  const calculateAge = (birthDate: Date | string): number => {
+    const birth = new Date(birthDate);
 
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birthDate.getDate())
-    ) {
-      return age - 1;
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const month = today.getMonth() - birth.getMonth();
+
+    if (month < 0 || (month === 0 && today.getDate() < birth.getDate())) {
+      age--;
     }
+
     return age;
   };
 
@@ -299,7 +299,7 @@ export function CaregiverRegistrationForm({
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={formData.birthDate}
+                      selected={new Date(formData.birthDate || "")}
                       onSelect={(date) =>
                         setFormData((prev) => ({ ...prev, birthDate: date }))
                       }

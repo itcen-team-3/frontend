@@ -183,14 +183,14 @@ export function PatientForm({
       : "보호대상자 정보를 수정합니다";
   const buttonText = mode === "create" ? "등록하기" : "수정하기";
 
-  const calculateAge = (birthDate: Date | undefined): number | null => {
-    if (!birthDate) return null;
+  const calculateAge = (birthDate: Date | string): number => {
+    const birth = new Date(birthDate);
 
     const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const month = today.getMonth() - birthDate.getMonth();
+    let age = today.getFullYear() - birth.getFullYear();
+    const month = today.getMonth() - birth.getMonth();
 
-    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+    if (month < 0 || (month === 0 && today.getDate() < birth.getDate())) {
       age--;
     }
 
@@ -318,7 +318,7 @@ export function PatientForm({
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={formData.birthDate}
+                      selected={new Date(formData.birthDate || "")}
                       onSelect={handleDateChange}
                       disabled={(date) => date > new Date()}
                       initialFocus

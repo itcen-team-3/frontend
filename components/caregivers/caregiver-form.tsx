@@ -166,7 +166,7 @@ export function CaregiverForm({
       : "요양보호사 정보를 수정합니다";
   const buttonText = mode === "create" ? "등록하기" : "수정하기";
 
-  const calculateAge = (birthDate: Date): number => {
+  const calculateAge = (birthDate: Date | string): number => {
     const birth = new Date(birthDate);
 
     const today = new Date();
@@ -288,7 +288,8 @@ export function CaregiverForm({
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={formData?.birthDate}
+                      // TODO : 이게 맞아 ?
+                      selected={new Date(formData?.birthDate || "")}
                       onSelect={(date) => {
                         setFormData((prev) => ({ ...prev, birthDate: date }));
                         if (errors.birthDate) {
