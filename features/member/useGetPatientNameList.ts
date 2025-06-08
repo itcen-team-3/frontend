@@ -18,7 +18,6 @@ export const useGetPatientNameList = () => {
 
   useEffect(() => {
     const fetchPatientNameList = async () => {
-      const companyId = localStorage.getItem("company-id");
       setIsPatientNameListLoading(true);
       setErrorPatientNameList({
         code: 0,
@@ -27,7 +26,7 @@ export const useGetPatientNameList = () => {
 
       try {
         const res = await api.get<PatientNameListResponse>(
-          `/member/patient-name-list/${companyId}`
+          "/member/patient-name-list"
         );
         setPatientNameList(res.data);
       } catch (e: any) {
