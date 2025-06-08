@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/http";
 import type { CaregiverInfoRequest } from "@/lib/types/member";
 import { ErrorMessage } from "@/lib/types/api";
+import { format } from "date-fns";
 
 export const useGetCaregiverForUpdate = (caregiverId: string | undefined) => {
   const [data, setData] = useState<CaregiverInfoRequest | null>(null);
@@ -29,9 +30,7 @@ export const useGetCaregiverForUpdate = (caregiverId: string | undefined) => {
         );
         setData({
           ...res.data,
-          birthDate: res.data.birthDate
-            ? new Date(res.data.birthDate)
-            : undefined,
+          birthDate: format(new Date(res.data.birthDate || ""), "yyyy-MM-dd"),
         });
       } catch (e: any) {
         setError({

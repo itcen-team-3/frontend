@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/http";
 import type { PatientDetailResponse } from "@/lib/types/member";
 import { ErrorMessage } from "@/lib/types/api";
+import { format } from "date-fns";
 
 export const useGetPatient = (patientId: string | undefined) => {
   const [data, setData] = useState<PatientDetailResponse | null>(null);
@@ -27,7 +28,10 @@ export const useGetPatient = (patientId: string | undefined) => {
         const res = await api.get<PatientDetailResponse>(
           `/member/patient/detail/${patientId}`
         );
-        setData(res.data);
+        setData({
+          ...res.data,
+          birthDate: format(new Date(res.data.birthDate || ""), "yyyy-MM-dd"),
+        });
       } catch (e: any) {
         setError({
           code: e?.response?.status || 500,
