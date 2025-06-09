@@ -40,7 +40,7 @@ interface ScheduleFormProps {
   initialData?: WorkScheduleRequest;
   isLoading: boolean;
   error: ErrorMessage;
-  onClickCreateWorkScheduleButton: (args: WorkScheduleRequest) => void;
+  onSaveWorkScheduleButton: (args: WorkScheduleRequest) => void;
 }
 
 export function ScheduleForm({
@@ -61,7 +61,7 @@ export function ScheduleForm({
     paymentType: "방문급여",
     isFamily: false,
   },
-  onClickCreateWorkScheduleButton,
+  onSaveWorkScheduleButton,
 }: ScheduleFormProps) {
   const [formData, setFormData] = useState<WorkScheduleRequest>(initialData);
 
@@ -122,7 +122,7 @@ export function ScheduleForm({
       workDay: formData.days?.reduce((prev, curr) => prev + curr, 0) || 0,
     };
 
-    onClickCreateWorkScheduleButton(data);
+    onSaveWorkScheduleButton(data);
   };
 
   const title = mode === "create" ? "근무 일정 등록" : "근무 일정 수정";
