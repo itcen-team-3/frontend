@@ -7,9 +7,6 @@ COPY . .
 # 의존성 설치
 RUN npm install --legacy-peer-deps
 
-# .env 파일 복사
-COPY .env.production .env
-
 # 빌드 실행
 RUN npm run build
 
