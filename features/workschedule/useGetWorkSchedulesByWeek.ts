@@ -37,6 +37,14 @@ export const useGetWorkSchedulesByWeek = (startDate: string) => {
           },
         });
 
+        res.data.schedulesWeek.forEach((item) => {
+          item.scheduleDate = new Date(item.scheduleDate || "");
+          item.startTime = item.startTime.slice(0, 5);
+          item.endTime = item.endTime.slice(0, 5);
+        });
+
+        console.log("res.data", res.data);
+
         setData(res.data);
       } catch (e: any) {
         setError({

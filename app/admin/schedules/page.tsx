@@ -9,17 +9,11 @@ export default function ScheduleOverviewPage() {
   const { data, caregiverNameList, refetchGetWorkSchedulesByWeek } =
     useGetWorkSchedulesByWeek(startDate);
 
-  // TODO : api 변경 후 테스트
-  console.log("data", data);
-
   return (
     <AdminScheduleOverview
       caregiverNameList={caregiverNameList?.caregivers || []}
       refetchGetWorkSchedulesByWeek={refetchGetWorkSchedulesByWeek}
-      // TODO : 추후 제거 build 에러 해결용
-      caregivers={[]}
-      patients={[]}
-      scheduleEvents={[]}
+      scheduleEvents={data?.schedulesWeek || []}
     />
   );
 }
