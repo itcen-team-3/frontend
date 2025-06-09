@@ -11,21 +11,15 @@ import { useEditWorkSchedule } from "@/features/workschedule/useEditWorkSchedule
 export default function EditSchedulePage() {
   const { id } = useParams() as { id?: string };
 
-  const {
-    caregiverNameList,
-    isCaregiverNameListLoading,
-    errorCaregiverNameList,
-  } = useGetCaregiverNameList();
-  const { patientNameList, isPatientNameListLoading, errorPatientNameList } =
-    useGetPatientNameList();
+  const { caregiverNameList, isCaregiverNameListLoading } =
+    useGetCaregiverNameList();
+  const { patientNameList, isPatientNameListLoading } = useGetPatientNameList();
 
   const { data, isLoading, error } = useGetWorkScheduleDetail(id);
   const { editWorkSchedule } = useEditWorkSchedule();
 
   // TODO : 이 로직 검토
-  if (isCaregiverNameListLoading || isPatientNameListLoading) {
-    console.log("errorCaregiverNameList", errorCaregiverNameList);
-    console.log("errorPatientNameList", errorPatientNameList);
+  if (isCaregiverNameListLoading || isPatientNameListLoading || isLoading) {
     return <Loading />;
   }
 
