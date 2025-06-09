@@ -1,12 +1,12 @@
 "use client";
 
 import { ScheduleForm } from "@/components/schedules/schedule-form";
-import { WorkScheduleRequest } from "@/lib/types/workSchedule";
 import { useGetCaregiverNameList } from "@/features/member/useGetCaregiverNameList";
 import { useGetPatientNameList } from "@/features/member/useGetPatientNameList";
 import Loading from "@/components/ui/loading-page";
 import { useGetWorkScheduleDetail } from "@/features/workschedule/useGetWorkScheduleDetail";
 import { useParams } from "next/navigation";
+import { useEditWorkSchedule } from "@/features/workschedule/useEditWorkSchedule";
 
 export default function EditSchedulePage() {
   const { id } = useParams() as { id?: string };
@@ -19,7 +19,8 @@ export default function EditSchedulePage() {
   const { patientNameList, isPatientNameListLoading, errorPatientNameList } =
     useGetPatientNameList();
 
-  const { data } = useGetWorkScheduleDetail(id);
+  const { data, isLoading, error } = useGetWorkScheduleDetail(id);
+  const { editWorkSchedule } = useEditWorkSchedule();
 
   // TODO : 이 로직 검토
   if (isCaregiverNameListLoading || isPatientNameListLoading) {
@@ -34,17 +35,9 @@ export default function EditSchedulePage() {
       initialData={data || undefined}
       caregiverNameList={caregiverNameList?.caregivers || []}
       patientNameList={patientNameList?.patients || []}
-      isLoading={false}
-      error={{
-        code: 0,
-        message: "",
-      }}
-      onClickCreateWorkScheduleButton={function (
-        args: WorkScheduleRequest
-      ): void {
-        console.log(args);
-        throw new Error("Function not implemented.");
-      }}
+      isLoading={isLoading}
+      error={error}
+      onSaveWorkScheduleButton={(value) => editWorkSchedule(id, value)}
     />
   );
 }
