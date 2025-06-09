@@ -152,6 +152,7 @@ interface PatientDetailResponse {
 interface CaregiverNameListItem {
   caregiverId: number;
   caregiverName: string;
+  caregiverProfileUrl?: string;
 }
 
 interface CaregiverNameListResponse {
