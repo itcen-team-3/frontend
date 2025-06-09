@@ -29,12 +29,6 @@ import {
 import { CaregiverNameListItem } from "@/lib/types/member";
 import { WorkScheduleItem } from "@/lib/types/workSchedule";
 
-interface Caregiver {
-  caregiverId: string;
-  caregiverName: string;
-  imageUrl?: string;
-}
-
 interface Patient {
   id: string;
   name: string;
@@ -42,131 +36,13 @@ interface Patient {
 }
 
 interface AdminScheduleOverviewProps {
-  caregivers: Caregiver[];
-  patients: Patient[];
   scheduleEvents: WorkScheduleItem[];
   caregiverNameList: CaregiverNameListItem[];
   refetchGetWorkSchedulesByWeek: (args: string) => void;
 }
 
 export function AdminScheduleOverview({
-  caregivers = [
-    {
-      caregiverId: "1",
-      caregiverName: "김요양",
-      imageUrl: "/diverse-woman-portrait.png",
-    },
-    {
-      caregiverId: "2",
-      caregiverName: "박요양",
-      imageUrl: "/thoughtful-man.png",
-    },
-    {
-      caregiverId: "3",
-      caregiverName: "정요양",
-      imageUrl: "/diverse-woman-portrait.png",
-    },
-    {
-      caregiverId: "4",
-      caregiverName: "최요양",
-      imageUrl: "/thoughtful-man.png",
-    },
-    {
-      caregiverId: "5",
-      caregiverName: "이요양",
-      imageUrl: "/diverse-woman-portrait.png",
-    },
-  ],
-  patients = [
-    { id: "1", name: "이환자", address: "서울시 강남구" },
-    { id: "2", name: "최환자", address: "서울시 서초구" },
-    { id: "3", name: "강환자", address: "서울시 송파구" },
-    { id: "4", name: "윤환자", address: "서울시 마포구" },
-    { id: "5", name: "장환자", address: "서울시 용산구" },
-  ],
-  scheduleEvents = [
-    {
-      scheduleId: 1,
-      caregiverId: 1,
-      patientId: 1,
-      scheduleDate: new Date(2025, 5, 2), // 2025-06-02
-      startTime: "09:00",
-      endTime: "12:00",
-      patientName: "이환자",
-    },
-    {
-      scheduleId: 2,
-      caregiverId: 1,
-      patientId: 1,
-      scheduleDate: new Date(2025, 5, 5), // 2025-06-05
-      startTime: "09:00",
-      endTime: "12:00",
-      patientName: "박환자",
-    },
-    {
-      scheduleId: 3,
-      caregiverId: 1,
-      patientId: 1,
-      scheduleDate: new Date(2025, 5, 3), // 2025-06-03
-      startTime: "09:00",
-      endTime: "12:00",
-      patientName: "김환자",
-    },
-    {
-      scheduleId: 4,
-      caregiverId: 2,
-      patientId: 2,
-      scheduleDate: new Date(2025, 5, 8), // 2025-06-08
-      startTime: "14:00",
-      endTime: "17:00",
-      patientName: "이환자",
-    },
-    {
-      scheduleId: 5,
-      caregiverId: 2,
-      patientId: 2,
-      scheduleDate: new Date(2025, 5, 5), // 2025-06-05
-      startTime: "14:00",
-      endTime: "17:00",
-      patientName: "박환자",
-    },
-    {
-      scheduleId: 6,
-      caregiverId: 3,
-      patientId: 3,
-      scheduleDate: new Date(2025, 5, 3), // 2025-06-03
-      startTime: "10:00",
-      endTime: "13:00",
-      patientName: "조환자",
-    },
-    {
-      scheduleId: 7,
-      caregiverId: 3,
-      patientId: 3,
-      scheduleDate: new Date(2025, 5, 4), // 2025-06-04
-      startTime: "10:00",
-      endTime: "13:00",
-      patientName: "이환자",
-    },
-    {
-      scheduleId: 8,
-      caregiverId: 4,
-      patientId: 4,
-      scheduleDate: new Date(2025, 5, 4), // 2025-06-04
-      startTime: "13:00",
-      endTime: "16:00",
-      patientName: "박환자",
-    },
-    {
-      scheduleId: 9,
-      caregiverId: 5,
-      patientId: 5,
-      scheduleDate: new Date(2025, 5, 8), // 2025-06-08
-      startTime: "09:00",
-      endTime: "12:00",
-      patientName: "조환자",
-    },
-  ],
+  scheduleEvents,
   caregiverNameList,
   refetchGetWorkSchedulesByWeek,
 }: AdminScheduleOverviewProps) {
@@ -175,7 +51,7 @@ export function AdminScheduleOverview({
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
   const [selectedEventDetails, setSelectedEventDetails] = useState<{
-    caregiver: Caregiver;
+    caregiver: CaregiverNameListItem;
     patient: Patient;
     event: WorkScheduleItem;
   } | null>(null);
@@ -228,26 +104,24 @@ export function AdminScheduleOverview({
   };
 
   // 요양보호사 정보 가져오기
-  // TODO : caregiverNameList 바꾸기
-  console.log("caregiverNameList", caregiverNameList);
   const getCaregiverById = (id: string) => {
-    return caregivers.find((caregiver) => caregiver.caregiverId === id);
-  };
-
-  // 환자 정보 가져오기
-  const getPatientById = (id: string) => {
-    return patients.find((patient) => patient.id === id);
+    return caregiverNameList.find(
+      (caregiver) => caregiver.caregiverId === Number(id)
+    );
   };
 
   // 이벤트 클릭 핸들러
   const handleEventClick = (event: WorkScheduleItem) => {
     const caregiver = getCaregiverById(String(event.caregiverId));
-    const patient = getPatientById(String(event.patientId));
 
-    if (caregiver && patient) {
+    if (caregiver) {
       setSelectedEventDetails({
         caregiver,
-        patient,
+        patient: {
+          id: "1",
+          name: "test",
+          address: "haha",
+        },
         event,
       });
     }
@@ -301,8 +175,7 @@ export function AdminScheduleOverview({
               </div>
             ))}
             {/* 요양보호사별 row */}
-            {/* TODO : caregiverNameList 추후 적용 */}
-            {caregivers.map((caregiver) => (
+            {caregiverNameList.map((caregiver) => (
               <React.Fragment key={caregiver.caregiverId}>
                 {/* 요양보호사 이름 */}
                 <div className="flex items-center space-x-2 p-2">
@@ -332,14 +205,15 @@ export function AdminScheduleOverview({
                       className="min-h-[80px] border rounded-md p-1 overflow-y-auto"
                     >
                       {dayEvents.map((event) => {
-                        const patient = getPatientById(String(event.patientId));
                         return (
                           <div
                             key={event.scheduleId}
                             className="mb-1 p-1 text-xs bg-primary/10 rounded text-primary border border-primary/20 cursor-pointer hover:bg-primary/20"
                             onClick={() => handleEventClick(event)}
                           >
-                            <div className="font-medium">{patient?.name}</div>
+                            <div className="font-medium">
+                              {event.patientName}
+                            </div>
                             <div>
                               {event.startTime}-{event.endTime}
                             </div>
@@ -394,11 +268,9 @@ export function AdminScheduleOverview({
               <p className="text-sm text-muted-foreground">요양보호사</p>
               <div className="flex items-center">
                 <Avatar className="h-8 w-8 mr-2">
+                  {/* TODO : selectedEventDetails?.caregiver.profile 추후 추가 */}
                   <AvatarImage
-                    src={
-                      selectedEventDetails?.caregiver.imageUrl ||
-                      "/placeholder.svg"
-                    }
+                    src={"/placeholder.svg"}
                     alt={selectedEventDetails?.caregiver.caregiverName}
                   />
                   <AvatarFallback>
