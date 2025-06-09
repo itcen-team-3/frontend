@@ -7,18 +7,12 @@ import { ScheduleForm } from "@/components/schedules/schedule-form";
 import { useCreateWorkSchedule } from "@/features/workschedule/useCreateWorkSchedule";
 
 export default function NewSchedulePage() {
-  const {
-    caregiverNameList,
-    isCaregiverNameListLoading,
-    errorCaregiverNameList,
-  } = useGetCaregiverNameList();
-  const { patientNameList, isPatientNameListLoading, errorPatientNameList } =
-    useGetPatientNameList();
+  const { caregiverNameList, isCaregiverNameListLoading } =
+    useGetCaregiverNameList();
+  const { patientNameList, isPatientNameListLoading } = useGetPatientNameList();
   const { createWorkSchedule, isLoading, error } = useCreateWorkSchedule();
 
-  if (isCaregiverNameListLoading || isPatientNameListLoading) {
-    console.log("errorCaregiverNameList", errorCaregiverNameList);
-    console.log("errorPatientNameList", errorPatientNameList);
+  if (isCaregiverNameListLoading || isPatientNameListLoading || isLoading) {
     return <Loading />;
   }
 
