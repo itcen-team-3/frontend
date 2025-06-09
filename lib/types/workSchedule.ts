@@ -25,9 +25,12 @@ interface WorkScheduleItem {
   caregiverId?: number;
   patientId?: number;
   scheduleDate: Date | undefined; // TODO 점검 필요
+  caregiverName?: string;
+  patientAddress?: string;
   patientName: string;
   startTime: string;
   endTime: string;
+  caregiverImgUrl?: string;
 }
 
 interface AllWorkScheduleWeekResponse {
