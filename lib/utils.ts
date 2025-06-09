@@ -19,3 +19,21 @@ export function getStartOfWeek(date = new Date()) {
 
   return `${year}-${month}-${dayOfMonth}`;
 }
+
+/**
+ * 비트마스킹 정수를 받아 선택된 요일 비트값 배열로 반환
+ * @param bitmask 비트마스킹 정수 (예: 21)
+ * @returns 선택된 요일의 비트값 배열 (예: [1, 4, 16])
+ */
+export function decodeBitmaskToBitValues(bitmask: number): number[] {
+  const bitValues: number[] = [];
+
+  for (let i = 0; i < 7; i++) {
+    const bit = 1 << i;
+    if ((bitmask & bit) !== 0) {
+      bitValues.push(bit);
+    }
+  }
+
+  return bitValues;
+}

@@ -5,8 +5,12 @@ import { WorkScheduleRequest } from "@/lib/types/workSchedule";
 import { useGetCaregiverNameList } from "@/features/member/useGetCaregiverNameList";
 import { useGetPatientNameList } from "@/features/member/useGetPatientNameList";
 import Loading from "@/components/ui/loading-page";
+import { useGetWorkScheduleDetail } from "@/features/workschedule/useGetWorkScheduleDetail";
+import { useParams } from "next/navigation";
 
 export default function EditSchedulePage() {
+  const { id } = useParams() as { id?: string };
+
   const {
     caregiverNameList,
     isCaregiverNameListLoading,
@@ -14,23 +18,8 @@ export default function EditSchedulePage() {
   } = useGetCaregiverNameList();
   const { patientNameList, isPatientNameListLoading, errorPatientNameList } =
     useGetPatientNameList();
-  // 실제 구현에서는 ID를 기반으로 데이터를 가져옵니다
-  // TODO : 추후 제거 build 에러 해결용
-  // TODO : api 연동
-  const mockData = {
-    caregiverId: null,
-    patientName: "",
-    patientId: null,
-    startDate: new Date(),
-    endDate: new Date(new Date().setMonth(new Date().getMonth() + 3)),
-    startTime: "09:00",
-    endTime: "12:00",
-    days: [],
-    workDay: 0,
-    paymentForHour: 0,
-    paymentType: "방문급여",
-    isFamily: false,
-  };
+
+  const { data } = useGetWorkScheduleDetail(id);
 
   // TODO : 이 로직 검토
   if (isCaregiverNameListLoading || isPatientNameListLoading) {
@@ -42,7 +31,7 @@ export default function EditSchedulePage() {
   return (
     <ScheduleForm
       mode="edit"
-      initialData={mockData}
+      initialData={data || undefined}
       caregiverNameList={caregiverNameList?.caregivers || []}
       patientNameList={patientNameList?.patients || []}
       isLoading={false}
