@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/http";
-import type { CaregiverDetailResponse } from "@/lib/types/member";
 import { ErrorMessage } from "@/lib/types/api";
+import { WorkScheduleItem } from "@/lib/types/workSchedule";
 
 export const useGetWorkScheduleForPopup = (scheduleId: string | undefined) => {
-  const [popupData, setDataPopupData] =
-    useState<CaregiverDetailResponse | null>(null);
+  const [popupData, setDataPopupData] = useState<WorkScheduleItem | null>(null);
   const [isPopupLoading, setPopupLoading] = useState(true);
   const [errorPopup, setErrorPopup] = useState<ErrorMessage>({
     code: 0,
@@ -25,7 +24,7 @@ export const useGetWorkScheduleForPopup = (scheduleId: string | undefined) => {
       });
 
       try {
-        const res = await api.get<CaregiverDetailResponse>(
+        const res = await api.get<WorkScheduleItem>(
           `/work-schedule/admin/day/${scheduleId}`
         );
 
