@@ -29,7 +29,7 @@ export default function NewSchedulePage() {
       patientNameList={patientNameList?.patients || []}
       isLoading={isLoading}
       error={error}
-      onClickCreateWorkScheduleButton={(value) => createWorkSchedule(value)}
+      onSaveWorkScheduleButton={(value) => createWorkSchedule(value)}
     />
   );
 }
