@@ -1,3 +1,5 @@
+"use client";
+
 import { ScheduleForm } from "@/components/schedules/schedule-form";
 import { WorkScheduleRequest } from "@/lib/types/workSchedule";
 
