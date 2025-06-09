@@ -15,6 +15,11 @@ interface WorkScheduleRequest {
 }
 
 // work-schedule list
+interface AllWorkScheduleWeekRequest {
+  startDate: Date | string | undefined;
+  caregiverIds: { caregiverId: number }[];
+}
+
 interface WorkScheduleItem {
   scheduleId?: number;
   caregiverId?: number;
@@ -31,6 +36,7 @@ interface AllWorkScheduleWeekResponse {
 
 export {
   type WorkScheduleRequest,
+  type AllWorkScheduleWeekRequest,
   type WorkScheduleItem,
   type AllWorkScheduleWeekResponse,
 };

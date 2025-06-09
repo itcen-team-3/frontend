@@ -2,7 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/http";
 import { ErrorMessage } from "@/lib/types/api";
 import { useGetCaregiverNameList } from "../member/useGetCaregiverNameList";
-import { AllWorkScheduleWeekResponse } from "@/lib/types/workSchedule";
+import {
+  AllWorkScheduleWeekResponse,
+  AllWorkScheduleWeekRequest,
+} from "@/lib/types/workSchedule";
 
 export const useGetWorkSchedulesByWeek = (startDate: string) => {
   const [data, setData] = useState<AllWorkScheduleWeekResponse | null>(null);
@@ -24,15 +27,15 @@ export const useGetWorkSchedulesByWeek = (startDate: string) => {
             caregiverId: item.caregiverId,
           })) || [];
 
-        const res = await api.get<AllWorkScheduleWeekResponse>(
-          "/work-schedule/admin/week",
-          {
-            query: {
-              startDate,
-              caregiverIds,
-            },
-          }
-        );
+        const res = await api.post<
+          AllWorkScheduleWeekResponse,
+          AllWorkScheduleWeekRequest
+        >("/work-schedule/admin/week", {
+          body: {
+            startDate,
+            caregiverIds,
+          },
+        });
 
         setData(res.data);
       } catch (e: any) {
