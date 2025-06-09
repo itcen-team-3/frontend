@@ -28,12 +28,8 @@ import {
 } from "@/components/ui/dialog";
 import { CaregiverNameListItem } from "@/lib/types/member";
 import { WorkScheduleItem } from "@/lib/types/workSchedule";
-
-interface Patient {
-  id: string;
-  name: string;
-  address: string;
-}
+import { api } from "@/lib/http";
+import { useRouter } from "next/navigation";
 
 interface AdminScheduleOverviewProps {
   scheduleEvents: WorkScheduleItem[];
@@ -46,15 +42,15 @@ export function AdminScheduleOverview({
   caregiverNameList,
   refetchGetWorkSchedulesByWeek,
 }: AdminScheduleOverviewProps) {
-  // const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+  const router = useRouter();
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
-  const [selectedEventDetails, setSelectedEventDetails] = useState<{
-    caregiver: CaregiverNameListItem;
-    patient: Patient;
-    event: WorkScheduleItem;
-  } | null>(null);
+
+  const [selectedEventDetails, setSelectedEventDetails] =
+    useState<WorkScheduleItem | null>(null);
+  const [selectedScheduleId, setSelectedScheduleId] = useState<number>(0);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   // 현재 주의 날짜들
   const currentWeekDays = eachDayOfInterval({
@@ -103,28 +99,26 @@ export function AdminScheduleOverview({
     return eventsByDate[dateStr] || [];
   };
 
-  // 요양보호사 정보 가져오기
-  const getCaregiverById = (id: string) => {
-    return caregiverNameList.find(
-      (caregiver) => caregiver.caregiverId === Number(id)
+  // 이벤트 클릭 핸들러
+  const handleEventClick = async (event: WorkScheduleItem, date: Date) => {
+    setSelectedScheduleId(event.scheduleId || 0);
+    setSelectedDate(date);
+
+    const { data }: { data: WorkScheduleItem } = await api.get(
+      `/work-schedule/admin/day/${event.scheduleId}`
     );
+
+    const workSchedule = {
+      ...data,
+      startTime: data.startTime.slice(0, 5),
+      endTime: data.endTime.slice(0, 5),
+    };
+
+    setSelectedEventDetails(workSchedule);
   };
 
-  // 이벤트 클릭 핸들러
-  const handleEventClick = (event: WorkScheduleItem) => {
-    const caregiver = getCaregiverById(String(event.caregiverId));
-
-    if (caregiver) {
-      setSelectedEventDetails({
-        caregiver,
-        patient: {
-          id: "1",
-          name: "test",
-          address: "haha",
-        },
-        event,
-      });
-    }
+  const onClickMoveToEditPageButton = () => {
+    router.push(`/admin/schedules/${selectedScheduleId}/edit`);
   };
 
   return (
@@ -180,9 +174,7 @@ export function AdminScheduleOverview({
                 {/* 요양보호사 이름 */}
                 <div className="flex items-center space-x-2 p-2">
                   <Avatar className="h-8 w-8">
-                    {/* TODO : profileImage 내려달라고 할 것 .. */}
-                    {/* caregiver.profileImage */}
-                    <AvatarImage src={"/placeholder.svg"} />
+                    <AvatarImage src={caregiver.caregiverProfileUrl} />
                     <AvatarFallback>
                       {caregiver.caregiverName[0]}
                     </AvatarFallback>
@@ -209,7 +201,7 @@ export function AdminScheduleOverview({
                           <div
                             key={event.scheduleId}
                             className="mb-1 p-1 text-xs bg-primary/10 rounded text-primary border border-primary/20 cursor-pointer hover:bg-primary/20"
-                            onClick={() => handleEventClick(event)}
+                            onClick={() => handleEventClick(event, day)}
                           >
                             <div className="font-medium">
                               {event.patientName}
@@ -238,8 +230,8 @@ export function AdminScheduleOverview({
           <DialogHeader>
             <DialogTitle className="text-xl">스케줄 상세 정보</DialogTitle>
             <DialogDescription className="text-lg">
-              {selectedEventDetails?.caregiver.caregiverName} 요양보호사 -{" "}
-              {selectedEventDetails?.patient.name} 님
+              {selectedEventDetails?.caregiverName} 요양보호사 -{" "}
+              {selectedEventDetails?.patientName} 님
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -247,19 +239,17 @@ export function AdminScheduleOverview({
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">날짜</p>
                 <p className="text-base font-medium">
-                  {selectedEventDetails?.event.scheduleDate &&
-                    format(
-                      selectedEventDetails.event.scheduleDate,
-                      "yyyy년 MM월 dd일 (eee)",
-                      { locale: ko }
-                    )}
+                  {selectedDate &&
+                    format(selectedDate, "yyyy년 MM월 dd일 (eee)", {
+                      locale: ko,
+                    })}
                 </p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">시간</p>
                 <p className="text-base font-medium">
-                  {selectedEventDetails?.event.startTime} -{" "}
-                  {selectedEventDetails?.event.endTime}
+                  {selectedEventDetails?.startTime} -{" "}
+                  {selectedEventDetails?.endTime}
                 </p>
               </div>
             </div>
@@ -268,17 +258,16 @@ export function AdminScheduleOverview({
               <p className="text-sm text-muted-foreground">요양보호사</p>
               <div className="flex items-center">
                 <Avatar className="h-8 w-8 mr-2">
-                  {/* TODO : selectedEventDetails?.caregiver.profile 추후 추가 */}
                   <AvatarImage
-                    src={"/placeholder.svg"}
-                    alt={selectedEventDetails?.caregiver.caregiverName}
+                    src={selectedEventDetails?.caregiverImgUrl}
+                    alt={selectedEventDetails?.caregiverName}
                   />
                   <AvatarFallback>
-                    {selectedEventDetails?.caregiver.caregiverName[0]}
+                    {selectedEventDetails?.caregiverName?.slice(0, 1)}
                   </AvatarFallback>
                 </Avatar>
                 <p className="text-base font-medium">
-                  {selectedEventDetails?.caregiver.caregiverName}
+                  {selectedEventDetails?.caregiverName}
                 </p>
               </div>
             </div>
@@ -286,14 +275,14 @@ export function AdminScheduleOverview({
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">보호대상자</p>
               <p className="text-base font-medium">
-                {selectedEventDetails?.patient.name}
+                {selectedEventDetails?.patientName}
               </p>
             </div>
 
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">주소</p>
               <p className="text-base">
-                {selectedEventDetails?.patient.address}
+                {selectedEventDetails?.patientAddress}
               </p>
             </div>
           </div>
@@ -304,7 +293,7 @@ export function AdminScheduleOverview({
             >
               닫기
             </Button>
-            <Button>일정 수정</Button>
+            <Button onClick={onClickMoveToEditPageButton}>일정 수정</Button>
           </div>
         </DialogContent>
       </Dialog>
