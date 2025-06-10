@@ -169,6 +169,47 @@ interface PatientNameListResponse {
   patients: PatientNameListItem[];
 }
 
+// account list
+interface AccountItem {
+  memberId: string;
+  loginId: string;
+  name: string;
+  role: string;
+  patientName: string | null;
+  lastLoginAt: string | null;
+}
+
+interface AccountResponse {
+  content: AccountItem[];
+}
+
+interface RoleItem {
+  name: string;
+  displayName: string;
+}
+
+interface RoleRequest {
+  id: string;
+  password: string;
+  memberId?: string;
+  role?: string;
+}
+
+interface RoleNameItem {
+  memberId: string;
+  name: string;
+}
+
+interface PasswordRequest {
+  loginNewPw: string;
+  loginNewPwConfirm: string;
+}
+
+interface IdRequest {
+  memberId?: string;
+  loginNewId: string;
+}
+
 export {
   type SignInRequest,
   type SignInResponse,
@@ -189,4 +230,11 @@ export {
   type CaregiverNameListResponse,
   type PatientNameListItem,
   type PatientNameListResponse,
+  type AccountItem,
+  type AccountResponse,
+  type RoleItem,
+  type RoleRequest,
+  type RoleNameItem,
+  type PasswordRequest,
+  type IdRequest,
 };
