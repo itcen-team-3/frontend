@@ -55,6 +55,7 @@ export function AccountManagement({
   roleNameList,
   accounts,
   setSearchRole,
+  setSearchName,
   setRoleName,
   isGetAccountsLoading,
   nameListByRole,
@@ -163,6 +164,8 @@ export function AccountManagement({
 
   const onClickTab = (role: string) => {
     setSearchRole(role);
+    setSearchTerm("");
+    setSearchName("");
   };
 
   return (
@@ -318,12 +321,22 @@ export function AccountManagement({
               <div className="flex justify-between items-center">
                 <CardTitle className="text-xl">계정 목록</CardTitle>
                 <div className="relative w-64">
-                  <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                  <Search
+                    className="absolute left-3 top-3 h-5 w-5 text-muted-foreground"
+                    onClick={() => {
+                      setSearchName(searchTerm);
+                    }}
+                  />
                   <Input
                     placeholder="이름 또는 ID로 검색"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 h-12 text-lg"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        setSearchName(searchTerm);
+                      }
+                    }}
                   />
                 </div>
               </div>
