@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
-import { Camera, Trash2, Save, Send } from "lucide-react";
+import { Camera, Trash2, Send } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -22,12 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
-
-interface CareServiceCode {
-  code: string;
-  name: string;
-  category: string;
-}
+import { CareItem } from "@/lib/types/careLogs";
 
 interface Photo {
   id: string;
@@ -39,36 +34,15 @@ interface Photo {
 interface CareLogCreateFormProps {
   patientName: string;
   date: string;
-  serviceCodes?: CareServiceCode[];
+  careItemList: CareItem[];
+  createCareLog: (data: any) => void;
 }
 
 export function CareLogCreateForm({
   patientName = "이환자",
   date = "2025-05-21",
-  serviceCodes = [
-    { code: "A01", name: "세면도움", category: "신체활동지원" },
-    { code: "A02", name: "구강관리", category: "신체활동지원" },
-    { code: "A03", name: "머리감기기", category: "신체활동지원" },
-    { code: "A04", name: "몸단장", category: "신체활동지원" },
-    { code: "A05", name: "옷 갈아입히기", category: "신체활동지원" },
-    { code: "A06", name: "목욕도움", category: "신체활동지원" },
-    { code: "A07", name: "식사도움", category: "신체활동지원" },
-    { code: "A08", name: "체위변경", category: "신체활동지원" },
-    { code: "A09", name: "이동도움", category: "신체활동지원" },
-    { code: "A10", name: "신체기능 유지·증진", category: "기능유지·증진" },
-    { code: "B01", name: "화장실 이용하기", category: "일상생활지원" },
-    { code: "B02", name: "취사", category: "일상생활지원" },
-    { code: "B03", name: "청소 및 주변정돈", category: "일상생활지원" },
-    { code: "B04", name: "세탁", category: "일상생활지원" },
-    { code: "B05", name: "외출 시 동행", category: "일상생활지원" },
-    { code: "C01", name: "일상업무 대행", category: "가사·일상지원" },
-    { code: "D01", name: "말벗·격려 및 위로", category: "정서지원" },
-    { code: "D02", name: "생활상담", category: "정서지원" },
-    { code: "D03", name: "의사소통 도움", category: "정서지원" },
-    { code: "E01", name: "인지자극활동", category: "인지활동지원" },
-    { code: "E02", name: "일상생활 함께하기", category: "인지활동지원" },
-    { code: "Z99", name: "기타", category: "기타" },
-  ],
+  careItemList,
+  createCareLog,
 }: CareLogCreateFormProps) {
   const router = useRouter();
 
@@ -89,15 +63,15 @@ export function CareLogCreateForm({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 서비스 카테고리별로 그룹화
-  const servicesByCategory = serviceCodes.reduce(
+  const servicesByCategory = careItemList.reduce(
     (acc, service) => {
-      if (!acc[service.category]) {
-        acc[service.category] = [];
+      if (!acc[service.type]) {
+        acc[service.type] = [];
       }
-      acc[service.category].push(service);
+      acc[service.type].push(service);
       return acc;
     },
-    {} as Record<string, CareServiceCode[]>,
+    {} as Record<string, CareItem[]>
   );
 
   // 서비스 선택/해제
@@ -164,15 +138,13 @@ export function CareLogCreateForm({
   // 사진 타입 변경
   const handlePhotoTypeChange = (id: string, type: string) => {
     setPhotos((prev) =>
-      prev.map((photo) => (photo.id === id ? { ...photo, type } : photo)),
+      prev.map((photo) => (photo.id === id ? { ...photo, type } : photo))
     );
   };
 
   // 서명 관련 함수들
   const startDrawing = (
-    e:
-      | React.MouseEvent<HTMLCanvasElement>
-      | React.TouchEvent<HTMLCanvasElement>,
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -199,9 +171,7 @@ export function CareLogCreateForm({
   };
 
   const draw = (
-    e:
-      | React.MouseEvent<HTMLCanvasElement>
-      | React.TouchEvent<HTMLCanvasElement>,
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ) => {
     if (!isDrawing) return;
 
@@ -212,22 +182,25 @@ export function CareLogCreateForm({
     if (!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = isTouchEvent(e)
-      ? e.touches[0].clientX - rect.left
-      : e.clientX - rect.left;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
 
-    const y = isTouchEvent(e)
-      ? e.touches[0].clientY - rect.top
-      : e.clientY - rect.top;
+    const x =
+      (isTouchEvent(e)
+        ? e.touches[0].clientX - rect.left
+        : e.clientX - rect.left) * scaleX;
+
+    const y =
+      (isTouchEvent(e)
+        ? e.touches[0].clientY - rect.top
+        : e.clientY - rect.top) * scaleY;
 
     ctx.lineTo(x, y);
     ctx.stroke();
   };
 
   const isTouchEvent = (
-    e:
-      | React.MouseEvent<HTMLCanvasElement>
-      | React.TouchEvent<HTMLCanvasElement>,
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ): e is React.TouchEvent<HTMLCanvasElement> => {
     return "touches" in e;
   };
@@ -255,41 +228,19 @@ export function CareLogCreateForm({
     setIsSignatureDialogOpen(false);
   };
 
-  // 임시저장
-  const handleSaveDraft = async () => {
-    setIsSubmitting(true);
-    try {
-      const formData = {
-        patientName,
-        date,
-        selectedServices,
-        durations,
-        notes,
-        photos: photos.map((p) => ({
-          id: p.id,
-          type: p.type,
-          fileName: p.file.name,
-        })),
-        signature,
-        status: "draft",
-      };
-
-      console.log("임시저장:", formData);
-
-      // 실제 구현에서는 API 호출
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      alert("임시저장되었습니다.");
-    } catch (error) {
-      console.error("임시저장 실패:", error);
-      alert("임시저장에 실패했습니다.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   // 최종 제출
   const handleSubmit = async () => {
+    console.log("일지 리스트", durations);
+    console.log("사진들", photos);
+    console.log("서명", signature);
+
+    createCareLog({
+      ...durations,
+      signFile: signature,
+      description: notes,
+      // photo 어떻게 넘길건지
+    });
+
     // 유효성 검사
     if (selectedServices.length === 0) {
       alert("최소 1개 이상의 돌봄 활동을 선택해주세요.");
@@ -298,7 +249,7 @@ export function CareLogCreateForm({
 
     // 선택된 서비스의 소요시간 체크
     const missingDurations = selectedServices.filter(
-      (code) => !durations[code] || durations[code] === "",
+      (code) => !durations[code] || durations[code] === ""
     );
     if (missingDurations.length > 0) {
       alert("선택한 모든 돌봄 활동의 소요시간을 입력해주세요.");
@@ -342,6 +293,31 @@ export function CareLogCreateForm({
     }
   };
 
+  const getCareItemName = (type: string) => {
+    switch (type) {
+      case "DAILY":
+        return "일상생활지원";
+      case "RECOGNITION":
+        return "인지활동지원";
+      case "PHYSICAL":
+        return "신체활동지원";
+      case "EMOTION":
+        return "정서지원";
+      case "ETC":
+        return "기타";
+      default:
+        return "기타";
+    }
+  };
+
+  const onClickNextPhotoButton = () => {
+    setActiveTab("photos");
+  };
+
+  const onClickNextSignButton = () => {
+    setActiveTab("signature");
+  };
+
   return (
     <PageContainer>
       <PageHeader
@@ -380,46 +356,48 @@ export function CareLogCreateForm({
             {Object.entries(servicesByCategory).map(([category, services]) => (
               <Card key={category} className="card-shadow">
                 <CardHeader>
-                  <CardTitle className="text-xl">{category}</CardTitle>
+                  <CardTitle className="text-xl">
+                    {getCareItemName(category)}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-4">
                     {services.map((service) => (
                       <div
-                        key={service.code}
+                        key={service.id}
                         className="flex items-start space-x-3 p-3 border rounded-lg"
                       >
                         <Checkbox
-                          id={service.code}
-                          checked={selectedServices.includes(service.code)}
+                          id={service.id}
+                          checked={selectedServices.includes(service.id)}
                           onCheckedChange={() =>
-                            handleServiceToggle(service.code)
+                            handleServiceToggle(service.id)
                           }
                           className="w-6 h-6 mt-1"
                         />
                         <div className="flex-1">
                           <Label
-                            htmlFor={service.code}
+                            htmlFor={service.id}
                             className="text-lg font-medium cursor-pointer"
                           >
                             {service.name}
                           </Label>
-                          {selectedServices.includes(service.code) && (
+                          {selectedServices.includes(service.id) && (
                             <div className="mt-2 flex items-center">
                               <Label
-                                htmlFor={`duration-${service.code}`}
+                                htmlFor={`duration-${service.id}`}
                                 className="mr-2 text-base"
                               >
                                 소요 시간 (분):
                               </Label>
                               <Input
-                                id={`duration-${service.code}`}
+                                id={`duration-${service.id}`}
                                 type="number"
-                                value={durations[service.code] || ""}
+                                value={durations[service.id] || ""}
                                 onChange={(e) =>
                                   handleDurationChange(
-                                    service.code,
-                                    e.target.value,
+                                    service.id,
+                                    e.target.value
                                   )
                                 }
                                 className="w-24 text-lg"
@@ -451,21 +429,11 @@ export function CareLogCreateForm({
               </CardContent>
             </Card>
 
-            <div className="flex justify-between space-x-4">
-              <Button
-                variant="outline"
-                size="lg"
-                className="text-lg"
-                onClick={handleSaveDraft}
-                disabled={isSubmitting}
-              >
-                <Save className="mr-2 h-5 w-5" />
-                임시저장
-              </Button>
+            <div className="flex justify-end space-x-4">
               <Button
                 size="lg"
                 className="text-lg"
-                onClick={() => setActiveTab("photos")}
+                onClick={onClickNextPhotoButton}
               >
                 다음: 사진 첨부
               </Button>
@@ -569,7 +537,7 @@ export function CareLogCreateForm({
                 <Button
                   size="lg"
                   className="text-lg"
-                  onClick={() => setActiveTab("signature")}
+                  onClick={onClickNextSignButton}
                 >
                   다음: 서명 및 제출
                 </Button>
@@ -602,7 +570,6 @@ export function CareLogCreateForm({
                 </div>
 
                 <div className="border rounded-lg p-6">
-                  <h3 className="text-lg font-medium mb-4">서명</h3>
                   {signature ? (
                     <div className="space-y-4">
                       <div className="border rounded-md p-4 flex justify-center bg-gray-50">
@@ -643,16 +610,6 @@ export function CareLogCreateForm({
                     이전: 사진 첨부
                   </Button>
                   <div className="flex space-x-4">
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="text-lg"
-                      onClick={handleSaveDraft}
-                      disabled={isSubmitting}
-                    >
-                      <Save className="mr-2 h-5 w-5" />
-                      임시저장
-                    </Button>
                     <Button
                       size="lg"
                       className="text-lg"
