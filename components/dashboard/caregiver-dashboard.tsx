@@ -1,9 +1,21 @@
+"use client";
+
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { LargeButton } from "@/components/ui/large-button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Clock, ClipboardList } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PatientNameListItem } from "@/lib/types/member";
+import { useRouter } from "next/navigation";
 
 interface CaregiverDashboardProps {
   caregiverName: string;
@@ -11,6 +23,8 @@ interface CaregiverDashboardProps {
   workingHours: string | null;
   isWorkingDay: boolean;
   isCheckedIn: boolean;
+  patientNameList: PatientNameListItem[];
+  uuid: string;
 }
 
 export function CaregiverDashboard({
@@ -19,7 +33,48 @@ export function CaregiverDashboard({
   workingHours = "12시부터 3시까지",
   isWorkingDay = true,
   isCheckedIn = false,
+  patientNameList,
+  uuid,
 }: CaregiverDashboardProps) {
+  const router = useRouter();
+
+  const [selectedPatient, setSelectedPatient] = useState<{
+    patientId: string;
+    patientName: string;
+  }>({
+    patientId: "",
+    patientName: "",
+  });
+  const handleSelectChange = (name: string, value: string) => {
+    setSelectedPatient((prev: any) => {
+      const data = { ...prev, [name]: value };
+
+      if (name === "patientId") {
+        data.patientName =
+          patientNameList.find((item) => item.patientId === Number(value))
+            ?.patientName || "";
+      }
+
+      return data;
+    });
+  };
+
+  const onClickStartWorkButton = () => {
+    console.log(uuid);
+    // TODO uuid 넣어서 api 요청보내기
+  };
+
+  const onClickFinishWork = () => {
+    console.log(uuid);
+    // TODO uuid 넣어서 api 요청보내기
+  };
+
+  const onClickCreateCareLogButton = () => {
+    // TODO : sessionStorage 에 저장 후 돌봄일지 생성 후 제거
+    console.log("선택된 보호대상자 id", selectedPatient.patientId);
+    router.push("/caregiver/care-logs/new");
+  };
+
   return (
     <PageContainer>
       <PageHeader
@@ -49,6 +104,7 @@ export function CaregiverDashboard({
               <LargeButton
                 className="bg-green-600 hover:bg-green-700 text-white"
                 disabled={isCheckedIn}
+                onClick={onClickStartWorkButton}
               >
                 <Clock className="mr-2 h-6 w-6" />
                 출근하기
@@ -56,6 +112,7 @@ export function CaregiverDashboard({
               <LargeButton
                 className="bg-red-600 hover:bg-red-700 text-white"
                 disabled={!isCheckedIn}
+                onClick={onClickFinishWork}
               >
                 <Clock className="mr-2 h-6 w-6" />
                 퇴근하기
@@ -68,8 +125,42 @@ export function CaregiverDashboard({
           <CardHeader>
             <CardTitle className="text-xl">돌봄 일지</CardTitle>
           </CardHeader>
+
           <CardContent>
-            <LargeButton className="w-full">
+            <div className="space-y-2">
+              <Select
+                value={
+                  selectedPatient.patientId === null
+                    ? undefined
+                    : String(selectedPatient.patientId)
+                }
+                onValueChange={(value) =>
+                  handleSelectChange("patientId", value)
+                }
+              >
+                <SelectTrigger className="text-lg h-14">
+                  <SelectValue placeholder="보호대상자를 선택하세요" />
+                </SelectTrigger>
+                <SelectContent>
+                  {patientNameList.map((patient) => (
+                    <SelectItem
+                      key={patient.patientId}
+                      value={String(patient.patientId)}
+                      className="text-lg"
+                    >
+                      {patient.patientName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+
+          <CardContent>
+            <LargeButton
+              className="w-full"
+              onClick={onClickCreateCareLogButton}
+            >
               <ClipboardList className="mr-2 h-6 w-6" />
               돌봄 일지 작성하기
             </LargeButton>
