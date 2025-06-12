@@ -37,9 +37,19 @@ interface AllWorkScheduleWeekResponse {
   schedulesWeek: WorkScheduleItem[];
 }
 
+interface CaregiverWorkSchedulesByDayResponse {
+  scheduleDay: WorkScheduleItem[];
+}
+
+interface CaregiverWorkSchedulesByWeekResponse {
+  scheduleWeek: WorkScheduleItem[];
+}
+
 export {
   type WorkScheduleRequest,
   type AllWorkScheduleWeekRequest,
   type WorkScheduleItem,
   type AllWorkScheduleWeekResponse,
+  type CaregiverWorkSchedulesByDayResponse,
+  type CaregiverWorkSchedulesByWeekResponse,
 };
