@@ -22,6 +22,7 @@ interface FamilyDashboardProps {
   caregiverName: string;
   caregiverStatus: "working" | "scheduled" | "off";
   careLogs: CareLog[];
+  onCareLogClick?: (logId: string) => void;
 }
 
 export function FamilyDashboard({
@@ -43,6 +44,7 @@ export function FamilyDashboard({
       activities: ["식사도움", "청소 및 주변정돈", "외출 시 동행"],
     },
   ],
+  onCareLogClick,
 }: FamilyDashboardProps) {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
 
@@ -111,7 +113,12 @@ export function FamilyDashboard({
                   <div key={log.id} className="p-4 border rounded-lg">
                     <div className="flex justify-between items-center mb-2">
                       <h3 className="text-lg font-medium">{log.date}</h3>
-                      <Button variant="outline" size="sm" className="h-8">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="h-8"
+                        onClick={() => onCareLogClick?.(log.id)}
+                      >
                         <ClipboardList className="w-4 h-4 mr-1" />
                         상세보기
                       </Button>
