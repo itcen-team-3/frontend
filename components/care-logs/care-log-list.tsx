@@ -1,21 +1,18 @@
 "use client";
 
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageContainer } from "@/components/ui/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { ClipboardList, Plus } from "lucide-react";
 import Link from "next/link";
 
 interface CareLog {
-  id: string;
-  date: string;
-  patientName: string;
-  caregiverName: string;
-  activities: string[];
+  careLogId: number;
+  createDate: string;
+  activeCount: number;
+  caregiverName?: string;
 }
 
 interface CareLogListProps {
@@ -25,33 +22,8 @@ interface CareLogListProps {
 
 export function CareLogList({
   userRole = "caregiver",
-  careLogs = [
-    {
-      id: "1",
-      date: "2025-05-21",
-      patientName: "이환자",
-      caregiverName: "김요양",
-      activities: ["식사도움", "목욕도움", "말벗·격려 및 위로"],
-    },
-    {
-      id: "2",
-      date: "2025-05-20",
-      patientName: "이환자",
-      caregiverName: "김요양",
-      activities: ["식사도움", "청소 및 주변정돈", "외출 시 동행"],
-    },
-    {
-      id: "3",
-      date: "2025-05-19",
-      patientName: "최환자",
-      caregiverName: "박요양",
-      activities: ["식사도움", "목욕도움", "인지자극활동"],
-    },
-  ],
+  careLogs,
 }: CareLogListProps) {
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [activeTab, setActiveTab] = useState<string>("all");
-
   // 날짜 형식 변환 함수
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -62,24 +34,6 @@ export function CareLogList({
       weekday: "long",
     });
   };
-
-  // 필터링된 로그
-  const filteredLogs = careLogs.filter((log) => {
-    if (activeTab === "all") return true;
-
-    // 날짜 필터링 (선택한 날짜와 일치하는 로그만)
-    if (date) {
-      const logDate = new Date(log.date);
-      const selectedDate = new Date(date);
-      return (
-        logDate.getFullYear() === selectedDate.getFullYear() &&
-        logDate.getMonth() === selectedDate.getMonth() &&
-        logDate.getDate() === selectedDate.getDate()
-      );
-    }
-
-    return true;
-  });
 
   return (
     <PageContainer>
@@ -98,21 +52,7 @@ export function CareLogList({
         )}
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3 mt-6">
-        <Card className="card-shadow md:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-xl">날짜 선택</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              className="rounded-md border"
-            />
-          </CardContent>
-        </Card>
-
+      <div className="grid gap-6 mt-6">
         <Card className="card-shadow md:col-span-2">
           <CardHeader>
             <CardTitle className="text-xl">돌봄 일지 목록</CardTitle>
@@ -121,40 +61,29 @@ export function CareLogList({
             <Tabs
               defaultValue="all"
               className="w-full"
-              onValueChange={setActiveTab}
+              onValueChange={() => {}}
             >
-              <TabsList className="mb-4">
-                <TabsTrigger value="all" className="text-base">
-                  전체
-                </TabsTrigger>
-                <TabsTrigger value="date" className="text-base">
-                  선택 날짜
-                </TabsTrigger>
-              </TabsList>
-
               <TabsContent value="all" className="mt-0">
                 <div className="space-y-4">
                   {careLogs.length > 0 ? (
                     careLogs.map((log) => (
                       <Link
-                        href={`/caregiver/care-logs/${log.id}`}
-                        key={log.id}
+                        href={`/caregiver/care-logs/${log.careLogId}`}
+                        key={log.careLogId}
                       >
                         <div className="p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
                           <div className="flex justify-between items-center mb-2">
                             <h3 className="text-lg font-medium">
-                              {formatDate(log.date)}
+                              {formatDate(log.createDate)}
                             </h3>
                             <ClipboardList className="h-5 w-5 text-muted-foreground" />
                           </div>
                           <div className="flex justify-between items-center">
                             <p className="text-base text-muted-foreground">
-                              {userRole === "family"
-                                ? log.caregiverName
-                                : log.patientName}
+                              {log.caregiverName}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                              {log.activities.length}개 활동
+                              {log.activeCount}개 활동
                             </p>
                           </div>
                         </div>
@@ -173,27 +102,25 @@ export function CareLogList({
 
               <TabsContent value="date" className="mt-0">
                 <div className="space-y-4">
-                  {filteredLogs.length > 0 ? (
-                    filteredLogs.map((log) => (
+                  {careLogs.length > 0 ? (
+                    careLogs.map((log) => (
                       <Link
-                        href={`/caregiver/care-logs/${log.id}`}
-                        key={log.id}
+                        href={`/caregiver/care-logs/${log.careLogId}`}
+                        key={log.careLogId}
                       >
                         <div className="p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
                           <div className="flex justify-between items-center mb-2">
                             <h3 className="text-lg font-medium">
-                              {formatDate(log.date)}
+                              {formatDate(log.createDate)}
                             </h3>
                             <ClipboardList className="h-5 w-5 text-muted-foreground" />
                           </div>
                           <div className="flex justify-between items-center">
                             <p className="text-base text-muted-foreground">
-                              {userRole === "family"
-                                ? log.caregiverName
-                                : log.patientName}
+                              {log.caregiverName}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                              {log.activities.length}개 활동
+                              {log.activeCount}개 활동
                             </p>
                           </div>
                         </div>
