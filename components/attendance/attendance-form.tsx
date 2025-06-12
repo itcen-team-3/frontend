@@ -13,10 +13,21 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { api } from "@/lib/http";
+import { useModal } from "@/context/ModalContext";
 
 interface AttendanceFormProps {
   type?: "check-in" | "check-out";
@@ -33,7 +44,10 @@ interface Patient {
   patientName: string;
 }
 
-export function AttendanceForm({ mode = "create", initialData }: AttendanceFormProps) {
+export function AttendanceForm({
+  mode = "create",
+  initialData,
+}: AttendanceFormProps) {
   const router = useRouter();
 
   const [date, setDate] = useState<Date>(initialData?.date || new Date());
@@ -44,13 +58,18 @@ export function AttendanceForm({ mode = "create", initialData }: AttendanceFormP
   const [uploadProgress, setUploadProgress] = useState(0);
   const [type, setType] = useState<"check-in" | "check-out">("check-in");
   const [patients, setPatients] = useState<Patient[]>([]);
-  const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
+  const [selectedPatientId, setSelectedPatientId] = useState<number | null>(
+    null
+  );
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
+  const { showAlert } = useModal();
+
   useEffect(() => {
-    api.get<Patient[]>("/member/caregiver/patient-name-list")
-      .then(res => setPatients(res.data || []))
-      .catch(err => console.error("환자 목록 요청 실패:", err));
+    api
+      .get<Patient[]>("/member/caregiver/patient-name-list")
+      .then((res) => setPatients(res.data || []))
+      .catch((err) => console.error("환자 목록 요청 실패:", err));
   }, []);
 
   const handleSubmit = async () => {
@@ -74,7 +93,10 @@ export function AttendanceForm({ mode = "create", initialData }: AttendanceFormP
     try {
       const token = localStorage.getItem("access-token");
       const xhr = new XMLHttpRequest();
-      xhr.open("POST", `${process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8080/api/v1/"}attendance-explation`);
+      xhr.open(
+        "POST",
+        `${process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8080/api/v1/"}attendance-explation`
+      );
       xhr.setRequestHeader("Content-Type", "application/json");
       xhr.setRequestHeader("Authorization", `Bearer ${token}`);
 
@@ -87,7 +109,7 @@ export function AttendanceForm({ mode = "create", initialData }: AttendanceFormP
       xhr.onload = () => {
         setLoading(false);
         if (xhr.status === 200 || xhr.status === 201) {
-          alert("소명이 성공적으로 제출되었습니다.");
+          showAlert({ message: "소명이 성공적으로 제출되었습니다." });
           router.refresh();
           router.push("/caregiver/attendance");
         } else {
@@ -95,47 +117,68 @@ export function AttendanceForm({ mode = "create", initialData }: AttendanceFormP
             const json = JSON.parse(xhr.responseText);
             if (json.fieldErrors) {
               const errors: Record<string, string> = {};
-              json.fieldErrors.forEach((e: any) => errors[e.field] = e.message);
+              json.fieldErrors.forEach(
+                (e: any) => (errors[e.field] = e.message)
+              );
               setFormErrors(errors);
             } else {
-              alert("제출에 실패했습니다.");
+              showAlert({ message: "제출에 실패했습니다." });
             }
           } catch {
-            alert("서버 오류가 발생했습니다.");
+            showAlert({ message: "서버 오류가 발생했습니다." });
           }
         }
       };
 
       xhr.onerror = () => {
         setLoading(false);
-        alert("네트워크 오류가 발생했습니다.");
+        showAlert({ message: "네트워크 오류가 발생했습니다." });
       };
 
       xhr.send(JSON.stringify(formData));
     } catch (err) {
       setLoading(false);
-      alert("알 수 없는 오류가 발생했습니다.");
+      showAlert({ message: "알 수 없는 오류가 발생했습니다." });
     }
   };
 
   return (
     <PageContainer>
-      <PageHeader title="출퇴근 소명하기" description="소명 사유 및 관련 정보를 입력해주세요." />
+      <PageHeader
+        title="출퇴근 소명하기"
+        description="소명 사유 및 관련 정보를 입력해주세요."
+      />
       <Card className="card-shadow">
-        <CardHeader><CardTitle className="text-xl">소명 내용 작성</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="text-xl">소명 내용 작성</CardTitle>
+        </CardHeader>
         <CardContent className="space-y-6">
           {/* 날짜 선택 */}
           <div className="space-y-2">
             <Label className="text-lg">날짜</Label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className={cn("w-full justify-start text-left text-lg font-normal h-14", !date && "text-muted-foreground")}>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left text-lg font-normal h-14",
+                    !date && "text-muted-foreground"
+                  )}
+                >
                   <CalendarIcon className="mr-2 h-5 w-5" />
-                  {date ? format(date, "PPP", { locale: ko }) : "날짜를 선택하세요"}
+                  {date
+                    ? format(date, "PPP", { locale: ko })
+                    : "날짜를 선택하세요"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
-                <Calendar mode="single" selected={date} onSelect={setDate} initialFocus required/>
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  initialFocus
+                  required
+                />
               </PopoverContent>
             </Popover>
           </div>
@@ -143,15 +186,28 @@ export function AttendanceForm({ mode = "create", initialData }: AttendanceFormP
           {/* 시간 입력 */}
           <div className="space-y-2">
             <Label className="text-lg">시간</Label>
-            <Input type="time" className="text-lg h-14" value={time} onChange={(e) => setTime(e.target.value)} disabled={mode === "view"} />
-            {formErrors.attendanceTime && <p className="text-red-500">{formErrors.attendanceTime}</p>}
+            <Input
+              type="time"
+              className="text-lg h-14"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              disabled={mode === "view"}
+            />
+            {formErrors.attendanceTime && (
+              <p className="text-red-500">{formErrors.attendanceTime}</p>
+            )}
           </div>
 
           {/* 출퇴근 유형 */}
           <div className="space-y-2">
             <Label className="text-lg">출퇴근 유형</Label>
-            <Select value={type} onValueChange={(v) => setType(v as "check-in" | "check-out")}>
-              <SelectTrigger className="w-full h-14 text-lg"><SelectValue placeholder="유형 선택" /></SelectTrigger>
+            <Select
+              value={type}
+              onValueChange={(v) => setType(v as "check-in" | "check-out")}
+            >
+              <SelectTrigger className="w-full h-14 text-lg">
+                <SelectValue placeholder="유형 선택" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="check-in">출근</SelectItem>
                 <SelectItem value="check-out">퇴근</SelectItem>
@@ -162,34 +218,60 @@ export function AttendanceForm({ mode = "create", initialData }: AttendanceFormP
           {/* 환자 선택 */}
           <div className="space-y-2">
             <Label className="text-lg">대상 환자</Label>
-            <Select value={selectedPatientId?.toString()} onValueChange={(v) => setSelectedPatientId(Number(v))}>
-              <SelectTrigger className="w-full h-14 text-lg"><SelectValue placeholder="환자 선택" /></SelectTrigger>
+            <Select
+              value={selectedPatientId?.toString()}
+              onValueChange={(v) => setSelectedPatientId(Number(v))}
+            >
+              <SelectTrigger className="w-full h-14 text-lg">
+                <SelectValue placeholder="환자 선택" />
+              </SelectTrigger>
               <SelectContent>
-                {patients.map(p => <SelectItem key={p.patientId} value={p.patientId.toString()}>{p.patientName}</SelectItem>)}
+                {patients.map((p) => (
+                  <SelectItem key={p.patientId} value={p.patientId.toString()}>
+                    {p.patientName}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-            {formErrors.patientId && <p className="text-red-500">{formErrors.patientId}</p>}
+            {formErrors.patientId && (
+              <p className="text-red-500">{formErrors.patientId}</p>
+            )}
           </div>
 
           {/* 소명 사유 */}
           <div className="space-y-2">
             <Label className="text-lg">소명 사유</Label>
-            <Textarea className="min-h-[150px] text-lg" placeholder="소명 사유를 상세히 작성해주세요" value={reason} onChange={(e) => setReason(e.target.value)} disabled={mode === "view"} />
-            {formErrors.explation && <p className="text-red-500">{formErrors.explation}</p>}
+            <Textarea
+              className="min-h-[150px] text-lg"
+              placeholder="소명 사유를 상세히 작성해주세요"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              disabled={mode === "view"}
+            />
+            {formErrors.explation && (
+              <p className="text-red-500">{formErrors.explation}</p>
+            )}
           </div>
 
           {/* 파일 첨부 */}
           {mode !== "view" && (
             <div className="space-y-2">
               <Label className="text-lg">이미지 첨부 (선택)</Label>
-              <Input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+              />
             </div>
           )}
 
           {/* 업로드 진행률 */}
           {loading && (
             <div className="w-full bg-gray-200 rounded h-3 overflow-hidden">
-              <div className="bg-blue-500 h-full transition-all" style={{ width: `${uploadProgress}%` }} />
+              <div
+                className="bg-blue-500 h-full transition-all"
+                style={{ width: `${uploadProgress}%` }}
+              />
             </div>
           )}
 
@@ -197,11 +279,32 @@ export function AttendanceForm({ mode = "create", initialData }: AttendanceFormP
           <div className="flex justify-end space-x-4 pt-4">
             {mode !== "view" ? (
               <>
-                <Button variant="outline" size="lg" className="text-lg" onClick={() => router.back()}>취소</Button>
-                <Button size="lg" className="text-lg" onClick={handleSubmit} disabled={loading}>{loading ? "제출 중..." : "제출하기"}</Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="text-lg"
+                  onClick={() => router.back()}
+                >
+                  취소
+                </Button>
+                <Button
+                  size="lg"
+                  className="text-lg"
+                  onClick={handleSubmit}
+                  disabled={loading}
+                >
+                  {loading ? "제출 중..." : "제출하기"}
+                </Button>
               </>
             ) : (
-              <Button variant="outline" size="lg" className="text-lg" onClick={() => router.push("/caregiver/attendance")}>목록으로</Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="text-lg"
+                onClick={() => router.push("/caregiver/attendance")}
+              >
+                목록으로
+              </Button>
             )}
           </div>
         </CardContent>
