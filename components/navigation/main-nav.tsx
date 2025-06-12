@@ -41,7 +41,7 @@ export function MainNav({ userRole }: MainNavProps) {
     },
     {
       title: "돌봄일지",
-      href: "/caregiver/care-logs/new",
+      href: "/caregiver/care-logs",
       icon: <ClipboardList className="w-6 h-6 mr-2" />,
       roles: ["caregiver"],
     },
@@ -102,7 +102,7 @@ export function MainNav({ userRole }: MainNavProps) {
   ];
 
   const filteredNavItems = navItems.filter((item) =>
-    item.roles.includes(userRole),
+    item.roles.includes(userRole)
   );
 
   return (
@@ -114,7 +114,7 @@ export function MainNav({ userRole }: MainNavProps) {
             href={item.href}
             className={cn(
               "flex items-center text-lg font-medium transition-colors hover:text-primary",
-              pathname === item.href ? "text-primary" : "text-muted-foreground",
+              pathname === item.href ? "text-primary" : "text-muted-foreground"
             )}
           >
             {item.icon}
@@ -130,7 +130,7 @@ export function MainNav({ userRole }: MainNavProps) {
             href={item.href}
             className={cn(
               "flex flex-col items-center justify-center text-sm font-medium transition-colors hover:text-primary",
-              pathname === item.href ? "text-primary" : "text-muted-foreground",
+              pathname === item.href ? "text-primary" : "text-muted-foreground"
             )}
           >
             {item.title}
@@ -160,7 +160,7 @@ export function MainNav({ userRole }: MainNavProps) {
                       "flex items-center text-lg font-medium p-2 rounded-lg transition-colors hover:bg-muted",
                       pathname === item.href
                         ? "bg-muted text-primary"
-                        : "text-muted-foreground",
+                        : "text-muted-foreground"
                     )}
                   >
                     {item.icon}
