@@ -21,7 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { CareItem } from "@/lib/types/careLogs";
 
 interface Photo {
@@ -44,7 +44,7 @@ export function CareLogCreateForm({
   careItemList,
   createCareLog,
 }: CareLogCreateFormProps) {
-  const router = useRouter();
+  // const router = useRouter();
 
   // 폼 상태 관리
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
@@ -230,16 +230,7 @@ export function CareLogCreateForm({
 
   // 최종 제출
   const handleSubmit = async () => {
-    console.log("일지 리스트", durations);
-    console.log("사진들", photos);
-    console.log("서명", signature);
-
-    createCareLog({
-      ...durations,
-      signFile: signature,
-      description: notes,
-      // photo 어떻게 넘길건지
-    });
+    const patientId = localStorage.getItem("patientId");
 
     // 유효성 검사
     if (selectedServices.length === 0) {
@@ -261,36 +252,14 @@ export function CareLogCreateForm({
       return;
     }
 
+    createCareLog({
+      patientId,
+      durations,
+      photos,
+      signFile: signature,
+      description: notes,
+    });
     setIsSubmitting(true);
-    try {
-      const formData = {
-        patientName,
-        date,
-        selectedServices,
-        durations,
-        notes,
-        photos: photos.map((p) => ({
-          id: p.id,
-          type: p.type,
-          fileName: p.file.name,
-        })),
-        signature,
-        status: "submitted",
-      };
-
-      console.log("최종 제출:", formData);
-
-      // 실제 구현에서는 API 호출
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      alert("돌봄 일지가 성공적으로 제출되었습니다.");
-      router.push("/caregiver/care-logs");
-    } catch (error) {
-      console.error("제출 실패:", error);
-      alert("제출에 실패했습니다. 다시 시도해주세요.");
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   const getCareItemName = (type: string) => {

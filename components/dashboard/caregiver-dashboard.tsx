@@ -8,70 +8,63 @@ import { LargeButton } from "@/components/ui/large-button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Clock, ClipboardList } from "lucide-react";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { PatientNameListItem } from "@/lib/types/member";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
 
 interface CaregiverDashboardProps {
   caregiverName: string;
   patientName: string | null;
   workingHours: string | null;
   isWorkingDay: boolean;
-  isCheckedIn: boolean;
-  patientNameList: PatientNameListItem[];
-  uuid: string;
+  attendanceStatus: string;
+  patientId: string;
+  uuid?: string;
+  createWorkStart: (uuid: string) => void;
+  createWorkEnd: (uuid: string) => void;
 }
 
 export function CaregiverDashboard({
-  caregiverName = "김요양",
-  patientName = "이환자",
-  workingHours = "12시부터 3시까지",
-  isWorkingDay = true,
-  isCheckedIn = false,
-  patientNameList,
-  uuid,
+  caregiverName,
+  patientName,
+  workingHours,
+  isWorkingDay,
+  attendanceStatus,
+  patientId,
+  uuid = "",
+  createWorkStart,
+  createWorkEnd,
 }: CaregiverDashboardProps) {
   const router = useRouter();
-
-  const [selectedPatient, setSelectedPatient] = useState<{
-    patientId: string;
-    patientName: string;
-  }>({
-    patientId: "",
-    patientName: "",
-  });
-  const handleSelectChange = (name: string, value: string) => {
-    setSelectedPatient((prev: any) => {
-      const data = { ...prev, [name]: value };
-
-      if (name === "patientId") {
-        data.patientName =
-          patientNameList.find((item) => item.patientId === Number(value))
-            ?.patientName || "";
-      }
-
-      return data;
-    });
-  };
+  const isCheckedIn = localStorage.getItem("check-in") === "1" ? true : false;
+  const [isCheckNFCDialogOpen, setIsCheckNFCDialogOpen] = useState(false);
 
   const onClickStartWorkButton = () => {
-    console.log(uuid);
-    // TODO uuid 넣어서 api 요청보내기
+    if (uuid.length === 0) {
+      setIsCheckNFCDialogOpen(true);
+    } else {
+      setIsCheckNFCDialogOpen(false);
+      createWorkStart(uuid);
+    }
   };
 
   const onClickFinishWork = () => {
-    console.log(uuid);
-    // TODO uuid 넣어서 api 요청보내기
+    if (uuid.length === 0) {
+      setIsCheckNFCDialogOpen(true);
+    } else {
+      setIsCheckNFCDialogOpen(false);
+      createWorkEnd(uuid);
+    }
   };
 
   const onClickCreateCareLogButton = () => {
-    // TODO : sessionStorage 에 저장 후 돌봄일지 생성 후 제거
-    console.log("선택된 보호대상자 id", selectedPatient.patientId);
+    localStorage.setItem("patientId", patientId);
     router.push("/caregiver/care-logs/new");
   };
 
@@ -81,7 +74,7 @@ export function CaregiverDashboard({
         title={`${caregiverName}님, 안녕하세요`}
         description={
           isWorkingDay
-            ? `오늘은 ${patientName}님, ${workingHours} 근무입니다`
+            ? `오늘은 ${patientName}님을 ${workingHours}까지 케어합니다.`
             : "오늘은 근무날이 아닙니다"
         }
       />
@@ -103,7 +96,7 @@ export function CaregiverDashboard({
             <div className="grid grid-cols-2 gap-4">
               <LargeButton
                 className="bg-green-600 hover:bg-green-700 text-white"
-                disabled={isCheckedIn}
+                disabled={isCheckedIn || attendanceStatus === "출근"}
                 onClick={onClickStartWorkButton}
               >
                 <Clock className="mr-2 h-6 w-6" />
@@ -125,37 +118,6 @@ export function CaregiverDashboard({
           <CardHeader>
             <CardTitle className="text-xl">돌봄 일지</CardTitle>
           </CardHeader>
-
-          <CardContent>
-            <div className="space-y-2">
-              <Select
-                value={
-                  selectedPatient.patientId === null
-                    ? undefined
-                    : String(selectedPatient.patientId)
-                }
-                onValueChange={(value) =>
-                  handleSelectChange("patientId", value)
-                }
-              >
-                <SelectTrigger className="text-lg h-14">
-                  <SelectValue placeholder="보호대상자를 선택하세요" />
-                </SelectTrigger>
-                <SelectContent>
-                  {patientNameList.map((patient) => (
-                    <SelectItem
-                      key={patient.patientId}
-                      value={String(patient.patientId)}
-                      className="text-lg"
-                    >
-                      {patient.patientName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-
           <CardContent>
             <LargeButton
               className="w-full"
@@ -167,6 +129,24 @@ export function CaregiverDashboard({
           </CardContent>
         </Card>
       </div>
+      <Dialog
+        open={isCheckNFCDialogOpen}
+        onOpenChange={setIsCheckNFCDialogOpen}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl">NFC 오류</DialogTitle>
+            <DialogDescription className="text-lg">
+              NFC 태깅 후 출/퇴근 버튼을 눌러주세요.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button size="lg" onClick={() => setIsCheckNFCDialogOpen(false)}>
+              확인
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PageContainer>
   );
 }

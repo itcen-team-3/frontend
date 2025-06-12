@@ -1,6 +1,7 @@
 "use client";
 
 import { CaregiverDashboard } from "@/components/dashboard/caregiver-dashboard";
+import { useParams } from "next/navigation";
 import { useCreateWorkStart } from "@/features/workschedule/useCreateWorkStart";
 import Loading from "@/components/ui/loading-page";
 import { useCreateWorkEnd } from "@/features/workschedule/useCreateWorkEnd";
@@ -8,6 +9,9 @@ import { useGetDashboardInfo } from "@/features/member/useGetCaregiverDashboardI
 import { findClosestOrActiveTime } from "@/lib/utils";
 
 export default function DashboardPage() {
+  const params = useParams();
+  const uuid = params?.uuid as string;
+
   const { dashboardInfo, isDashboardInfoLoading } = useGetDashboardInfo();
 
   // 추후 에러처리
@@ -31,7 +35,7 @@ export default function DashboardPage() {
       isWorkingDay={schedule ? true : false}
       attendanceStatus={schedule?.attendanceStatus || ""}
       patientId={schedule?.patientId || ""}
-      uuid={""}
+      uuid={uuid}
       createWorkStart={createWorkStart}
       createWorkEnd={createWorkEnd}
     />
