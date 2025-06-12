@@ -13,7 +13,11 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import {
   Select,
@@ -70,7 +74,7 @@ export function AttendanceForm({
 
   const handleSubmit = async () => {
     if (!date || !time || !reason || !selectedPatientId) {
-      alert("모든 필드를 입력해주세요.");
+      showAlert({ message: "모든 필드를 입력해주세요." });
       return;
     }
 
@@ -145,7 +149,9 @@ export function AttendanceForm({
         description="소명 사유 및 관련 정보를 입력해주세요."
       />
       <Card className="card-shadow">
-        <CardHeader><CardTitle className="text-xl">소명 내용 작성</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="text-xl">소명 내용 작성</CardTitle>
+        </CardHeader>
         <CardContent className="space-y-6">
           {/* 날짜 선택 */}
           {/* 날짜 선택 */}
@@ -162,7 +168,9 @@ export function AttendanceForm({
                   )}
                 >
                   <CalendarIcon className="mr-2 h-5 w-5" />
-                  {date ? format(date, "PPP", { locale: ko }) : "날짜를 선택하세요"}
+                  {date
+                    ? format(date, "PPP", { locale: ko })
+                    : "날짜를 선택하세요"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
@@ -272,7 +280,6 @@ export function AttendanceForm({
 
           {/* 버튼 */}
           <div className="flex justify-end space-x-4 pt-4">
-            {mode !== "view" ? (
             {mode !== "view" ? (
               <>
                 <Button

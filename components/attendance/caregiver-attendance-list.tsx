@@ -42,8 +42,6 @@ export function CaregiverAttendanceList() {
 
         console.log("응답 데이터:", res.data.attendances); // ← 추가
 
-
-
         setData(res.data.attendances || []);
       } catch (err) {
         console.error("데이터 조회 실패", err);
@@ -64,8 +62,7 @@ export function CaregiverAttendanceList() {
         />
         <Link href="/caregiver/attendance/new">
           <Button size="lg" className="text-lg">
-            <Plus className="mr-2 h-5 w-5" />
-            새 소명 작성
+            <Plus className="mr-2 h-5 w-5" />새 소명 작성
           </Button>
         </Link>
       </div>
@@ -89,7 +86,9 @@ export function CaregiverAttendanceList() {
               </div>
             ) : (
               Array.from(
-                new Map(data.map(item => [item.attendanceExplationId, item])).values()
+                new Map(
+                  data.map((item) => [item.attendanceExplationId, item])
+                ).values()
               ).map((item, index) => (
                 <div
                   key={item.attendanceExplationId}
@@ -99,9 +98,13 @@ export function CaregiverAttendanceList() {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-lg font-medium">
-                          {format(new Date(item.attendanceDate), "yyyy년 MM월 dd일", {
-                            locale: ko,
-                          })}{" "}
+                          {format(
+                            new Date(item.attendanceDate),
+                            "yyyy년 MM월 dd일",
+                            {
+                              locale: ko,
+                            }
+                          )}{" "}
                           {item.attendanceStatus} 소명
                         </h3>
                         <StatusBadge
@@ -113,10 +116,15 @@ export function CaregiverAttendanceList() {
                         <div>시간: {item.attendanceTime}</div>
                         <div>
                           제출:{" "}
-                          {format(new Date(item.submitDateTime), "yyyy-MM-dd HH:mm")}
+                          {format(
+                            new Date(item.submitDateTime),
+                            "yyyy-MM-dd HH:mm"
+                          )}
                         </div>
                       </div>
-                      <p className="text-base line-clamp-2">{item.explanation}</p>
+                      <p className="text-base line-clamp-2">
+                        {item.explanation}
+                      </p>
                       {item.rejectReason && (
                         <div className="mt-2 p-2 bg-muted rounded text-sm">
                           <span className="font-medium">반려 사유: </span>
@@ -124,7 +132,9 @@ export function CaregiverAttendanceList() {
                         </div>
                       )}
                     </div>
-                    <Link href={`/caregiver/attendance/${item.attendanceExplationId}`}>
+                    <Link
+                      href={`/caregiver/attendance/${item.attendanceExplationId}`}
+                    >
                       <Button variant="outline" size="icon">
                         <Eye className="h-4 w-4" />
                       </Button>

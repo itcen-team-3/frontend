@@ -23,6 +23,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 // import { useRouter } from "next/navigation";
 import { CareItem } from "@/lib/types/careLogs";
+import { useModal } from "@/context/ModalContext";
 
 interface Photo {
   id: string;
@@ -44,6 +45,7 @@ export function CareLogCreateForm({
   careItemList,
   createCareLog,
 }: CareLogCreateFormProps) {
+  const { showAlert } = useModal();
   // const router = useRouter();
 
   // 폼 상태 관리
@@ -234,7 +236,7 @@ export function CareLogCreateForm({
 
     // 유효성 검사
     if (selectedServices.length === 0) {
-      alert("최소 1개 이상의 돌봄 활동을 선택해주세요.");
+      showAlert({ message: "최소 1개 이상의 돌봄 활동을 선택해주세요." });
       return;
     }
 
@@ -243,12 +245,14 @@ export function CareLogCreateForm({
       (code) => !durations[code] || durations[code] === ""
     );
     if (missingDurations.length > 0) {
-      alert("선택한 모든 돌봄 활동의 소요시간을 입력해주세요.");
+      showAlert({
+        message: "선택한 모든 돌봄 활동의 소요시간을 입력해주세요.",
+      });
       return;
     }
 
     if (!signature) {
-      alert("서명을 완료해주세요.");
+      showAlert({ message: "서명을 완료해주세요." });
       return;
     }
 
