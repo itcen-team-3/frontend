@@ -27,12 +27,6 @@ export function CaregiverAttendanceList() {
   const [data, setData] = useState<AttendanceExplation[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const statusMap = {
-    대기: { label: "대기 중", status: "warning" },
-    승인: { label: "승인됨", status: "success" },
-    반려: { label: "거절됨", status: "error" },
-  } as const;
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -51,6 +45,18 @@ export function CaregiverAttendanceList() {
     };
     fetchData();
   }, []);
+
+  const getBedgeStatus = (status: string) => {
+    if (status === "대기") {
+      return "warning";
+    } else if (status === "승인") {
+      return "success";
+    } else if (status === "거절") {
+      return "error";
+    } else {
+      return "default";
+    }
+  };
 
   return (
     <PageContainer>
@@ -89,7 +95,7 @@ export function CaregiverAttendanceList() {
                 new Map(
                   data.map((item) => [item.attendanceExplationId, item])
                 ).values()
-              ).map((item, index) => (
+              ).map((item) => (
                 <div
                   key={item.attendanceExplationId}
                   className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
@@ -108,8 +114,8 @@ export function CaregiverAttendanceList() {
                           {item.attendanceStatus} 소명
                         </h3>
                         <StatusBadge
-                          status={statusMap[item.approveStatus].status}
-                          text={statusMap[item.approveStatus].label}
+                          status={getBedgeStatus(item.approveStatus)}
+                          text={item.approveStatus}
                         />
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground mb-2">
@@ -122,23 +128,19 @@ export function CaregiverAttendanceList() {
                           )}
                         </div>
                       </div>
-                      <p className="text-base line-clamp-2">
-                        {item.explanation}
-                      </p>
-                      {item.rejectReason && (
+                      {item.explation && (
                         <div className="mt-2 p-2 bg-muted rounded text-sm">
+                          <span className="font-medium">소명 내용: </span>
+                          {item.explation}
+                        </div>
+                      )}
+                      {item.rejectReason && (
+                        <div className="mt-2 p-2 bg-red-100 rounded text-sm">
                           <span className="font-medium">반려 사유: </span>
                           {item.rejectReason}
                         </div>
                       )}
                     </div>
-                    <Link
-                      href={`/caregiver/attendance/${item.attendanceExplationId}`}
-                    >
-                      <Button variant="outline" size="icon">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </Link>
                   </div>
                 </div>
               ))
