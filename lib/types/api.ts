@@ -3,6 +3,11 @@ interface ApiSuccess<T = unknown> {
   code: 200 | 201 | 204;
   message: string;
   data: T;
+  // error
+  status?: number;
+  error?: string;
+  path?: string;
+  timestamp?: string;
 }
 
 /* 실패 케이스 (4xx · 5xx) */
