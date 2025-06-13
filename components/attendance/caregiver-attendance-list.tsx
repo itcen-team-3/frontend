@@ -9,13 +9,13 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
-import { Plus, Eye } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 
 interface AttendanceExplation {
   attendanceExplationId: number;
   approveStatus: "대기" | "승인" | "반려";
-  explanation: string;
+  explation: string;
   rejectReason?: string;
   submitDateTime: string;
   attendanceDate: string;

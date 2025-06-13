@@ -93,6 +93,7 @@ export function AttendanceForm({
     try {
       const token = localStorage.getItem("access-token");
       const xhr = new XMLHttpRequest();
+      console.log("file", file);
       xhr.open(
         "POST",
         `${process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8080/api/v1/"}attendance-explation`
@@ -136,7 +137,8 @@ export function AttendanceForm({
       };
 
       xhr.send(JSON.stringify(formData));
-    } catch (err) {
+    } catch (err: any) {
+      console.log(err);
       setLoading(false);
       showAlert({ message: "알 수 없는 오류가 발생했습니다." });
     }
