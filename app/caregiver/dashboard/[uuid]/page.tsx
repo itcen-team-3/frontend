@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { CaregiverDashboard } from "@/components/dashboard/caregiver-dashboard";
 import { useParams } from "next/navigation";
 import { useCreateWorkStart } from "@/features/workschedule/useCreateWorkStart";
@@ -16,6 +17,12 @@ export default function DashboardPage() {
   // 추후 에러처리
   const { createWorkStart, isWorkStartLoading } = useCreateWorkStart();
   const { createWorkEnd, isWorkEndLoading } = useCreateWorkEnd();
+
+  useEffect(() => {
+    if (dashboardInfo?.patientId) {
+      localStorage.setItem("patientId", String(dashboardInfo?.patientId));
+    }
+  }, [dashboardInfo, isDashboardInfoLoading]);
 
   if (isWorkStartLoading || isWorkEndLoading || isDashboardInfoLoading) {
     return <Loading />;

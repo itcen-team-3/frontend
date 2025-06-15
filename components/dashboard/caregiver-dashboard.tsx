@@ -34,7 +34,6 @@ export function CaregiverDashboard({
   patientName,
   workingHours,
   isWorkingDay,
-  patientId,
   uuid = "",
   createWorkStart,
   createWorkEnd,
@@ -62,7 +61,6 @@ export function CaregiverDashboard({
   };
 
   const onClickCreateCareLogButton = () => {
-    localStorage.setItem("patientId", patientId);
     router.push("/caregiver/care-logs/new");
   };
 
