@@ -60,6 +60,7 @@ export function CaregiverForm({
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -266,7 +267,7 @@ export function CaregiverForm({
                 <Label htmlFor="birthDate" className="text-lg">
                   생년월일 <span className="text-red-500">*</span>
                 </Label>
-                <Popover>
+                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       id="birthDate"
@@ -288,10 +289,10 @@ export function CaregiverForm({
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      // TODO : 이게 맞아 ?
                       selected={new Date(formData?.birthDate || "")}
                       onSelect={(date) => {
                         setFormData((prev) => ({ ...prev, birthDate: date }));
+                        setIsCalendarOpen(false);
                         if (errors.birthDate) {
                           setErrors((prev) => ({
                             ...prev,
@@ -299,19 +300,27 @@ export function CaregiverForm({
                           }));
                         }
                       }}
-                      initialFocus
                       captionLayout="dropdown"
-                      fromYear={1930}
-                      toYear={new Date().getFullYear()}
                       classNames={{
                         caption_label: "hidden",
                         dropdown: "text-lg",
                         caption:
                           "flex justify-center pt-1 relative items-center",
-                        nav_button_previous: "absolute left-1",
-                        nav_button_next: "absolute right-1",
                         dropdown_month: "w-full",
                         dropdown_year: "w-full",
+                        nav: "absolute top-1/15 left-0 right-0 flex justify-between -translate-y-1/2 mr-0",
+                        nav_button:
+                          "h-7 w-7 bg-transparent p-0 opacity-70 hover:opacity-100",
+                        month_caption: "flex justify-center",
+                        button_previous: "ml-4",
+                        button_next: "mr-4",
+                        weekdays: "flex justify-around",
+                      }}
+                      modifiersStyles={{
+                        hasEvent: {
+                          backgroundColor: "rgba(59, 130, 246, 0.1)",
+                          fontWeight: "bold",
+                        },
                       }}
                     />
                   </PopoverContent>
