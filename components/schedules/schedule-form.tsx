@@ -64,6 +64,7 @@ export function ScheduleForm({
   onSaveWorkScheduleButton,
 }: ScheduleFormProps) {
   const [formData, setFormData] = useState<WorkScheduleRequest>(initialData);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const weekdays = [
     { value: 1 << 0, label: "월요일" },
@@ -262,7 +263,7 @@ export function ScheduleForm({
                 <Label htmlFor="startDate" className="text-lg">
                   근무 시작일
                 </Label>
-                <Popover>
+                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
@@ -283,23 +284,33 @@ export function ScheduleForm({
                     <Calendar
                       mode="single"
                       selected={formData.startDate}
-                      onSelect={(date) =>
-                        date &&
-                        setFormData((prev) => ({ ...prev, startDate: date }))
-                      }
-                      initialFocus
+                      onSelect={(date) => {
+                        if (date) {
+                          setFormData((prev) => ({ ...prev, startDate: date }));
+                          setIsCalendarOpen(false);
+                        }
+                      }}
                       captionLayout="dropdown"
-                      fromYear={2020}
-                      toYear={2030}
                       classNames={{
                         caption_label: "hidden",
                         dropdown: "text-lg",
                         caption:
                           "flex justify-center pt-1 relative items-center",
-                        nav_button_previous: "absolute left-1",
-                        nav_button_next: "absolute right-1",
                         dropdown_month: "w-full",
                         dropdown_year: "w-full",
+                        nav: "absolute top-1/15 left-0 right-0 flex justify-between -translate-y-1/2 mr-0",
+                        nav_button:
+                          "h-7 w-7 bg-transparent p-0 opacity-70 hover:opacity-100",
+                        month_caption: "flex justify-center",
+                        button_previous: "ml-4",
+                        button_next: "mr-4",
+                        weekdays: "flex justify-around",
+                      }}
+                      modifiersStyles={{
+                        hasEvent: {
+                          backgroundColor: "rgba(59, 130, 246, 0.1)",
+                          fontWeight: "bold",
+                        },
                       }}
                     />
                   </PopoverContent>
@@ -331,23 +342,33 @@ export function ScheduleForm({
                     <Calendar
                       mode="single"
                       selected={formData.endDate}
-                      onSelect={(date) =>
-                        date &&
-                        setFormData((prev) => ({ ...prev, endDate: date }))
-                      }
-                      initialFocus
+                      onSelect={(date) => {
+                        if (date) {
+                          setFormData((prev) => ({ ...prev, endDate: date }));
+                          setIsCalendarOpen(false);
+                        }
+                      }}
                       captionLayout="dropdown"
-                      fromYear={2020}
-                      toYear={2030}
                       classNames={{
                         caption_label: "hidden",
                         dropdown: "text-lg",
                         caption:
                           "flex justify-center pt-1 relative items-center",
-                        nav_button_previous: "absolute left-1",
-                        nav_button_next: "absolute right-1",
                         dropdown_month: "w-full",
                         dropdown_year: "w-full",
+                        nav: "absolute top-1/15 left-0 right-0 flex justify-between -translate-y-1/2 mr-0",
+                        nav_button:
+                          "h-7 w-7 bg-transparent p-0 opacity-70 hover:opacity-100",
+                        month_caption: "flex justify-center",
+                        button_previous: "ml-4",
+                        button_next: "mr-4",
+                        weekdays: "flex justify-around",
+                      }}
+                      modifiersStyles={{
+                        hasEvent: {
+                          backgroundColor: "rgba(59, 130, 246, 0.1)",
+                          fontWeight: "bold",
+                        },
                       }}
                     />
                   </PopoverContent>

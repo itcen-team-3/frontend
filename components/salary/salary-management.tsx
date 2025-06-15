@@ -88,6 +88,7 @@ export function SalaryManagement({
   const [searchTerm, setSearchTerm] = useState("");
   const [month, setMonth] = useState<Date | undefined>(new Date());
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   // 월 형식 변환 함수
   const formatMonth = (date: Date | undefined) => {
@@ -120,7 +121,7 @@ export function SalaryManagement({
   // 총 급여 계산
   const totalSalary = filteredRecords.reduce(
     (sum, record) => sum + record.totalAmount,
-    0,
+    0
   );
 
   // 엑셀 다운로드 함수 (실제 구현에서는 API 호출)
@@ -157,13 +158,13 @@ export function SalaryManagement({
           <CardContent className="space-y-6">
             <div className="space-y-2">
               <label className="text-lg font-medium">월 선택</label>
-              <Popover>
+              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left text-base md:text-lg font-normal h-12",
-                      !month && "text-muted-foreground",
+                      !month && "text-muted-foreground"
                     )}
                   >
                     <CalendarIcon className="mr-2 h-5 w-5" />
@@ -176,11 +177,33 @@ export function SalaryManagement({
                   <Calendar
                     mode="single"
                     selected={month}
-                    onSelect={setMonth}
-                    initialFocus
+                    onSelect={(month) => {
+                      if (month) {
+                        setMonth(month);
+                        setIsCalendarOpen(false);
+                      }
+                    }}
                     captionLayout="dropdown"
-                    fromYear={2020}
-                    toYear={2030}
+                    classNames={{
+                      caption_label: "hidden",
+                      dropdown: "text-lg",
+                      caption: "flex justify-center pt-1 relative items-center",
+                      dropdown_month: "w-full",
+                      dropdown_year: "w-full",
+                      nav: "absolute top-1/15 left-0 right-0 flex justify-between -translate-y-1/2 mr-0",
+                      nav_button:
+                        "h-7 w-7 bg-transparent p-0 opacity-70 hover:opacity-100",
+                      month_caption: "flex justify-center",
+                      button_previous: "ml-4",
+                      button_next: "mr-4",
+                      weekdays: "flex justify-around",
+                    }}
+                    modifiersStyles={{
+                      hasEvent: {
+                        backgroundColor: "rgba(59, 130, 246, 0.1)",
+                        fontWeight: "bold",
+                      },
+                    }}
                   />
                 </PopoverContent>
               </Popover>
@@ -298,7 +321,7 @@ export function SalaryManagement({
                                 "px-2 md:px-3 py-1 rounded-full text-xs md:text-sm whitespace-nowrap",
                                 record.status === "paid"
                                   ? "bg-green-100 text-green-800"
-                                  : "bg-yellow-100 text-yellow-800",
+                                  : "bg-yellow-100 text-yellow-800"
                               )}
                             >
                               {record.status === "paid" ? "지급완료" : "미지급"}
