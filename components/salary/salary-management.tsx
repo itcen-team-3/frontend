@@ -121,7 +121,7 @@ export function SalaryManagement({
   // 총 급여 계산
   const totalSalary = filteredRecords.reduce(
     (sum, record) => sum + record.totalAmount,
-    0
+    0,
   );
 
   // 엑셀 다운로드 함수 (실제 구현에서는 API 호출)
@@ -164,7 +164,7 @@ export function SalaryManagement({
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left text-base md:text-lg font-normal h-12",
-                      !month && "text-muted-foreground"
+                      !month && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon className="mr-2 h-5 w-5" />
@@ -321,7 +321,7 @@ export function SalaryManagement({
                                 "px-2 md:px-3 py-1 rounded-full text-xs md:text-sm whitespace-nowrap",
                                 record.status === "paid"
                                   ? "bg-green-100 text-green-800"
-                                  : "bg-yellow-100 text-yellow-800"
+                                  : "bg-yellow-100 text-yellow-800",
                               )}
                             >
                               {record.status === "paid" ? "지급완료" : "미지급"}

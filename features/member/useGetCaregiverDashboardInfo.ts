@@ -24,7 +24,7 @@ export const useGetDashboardInfo = () => {
 
       try {
         const res = await api.get<CaregiverDashboardInfoResponse>(
-          "/member/caregiver/dashboard"
+          "/member/caregiver/dashboard",
         );
 
         setDashboardInfo(res.data);

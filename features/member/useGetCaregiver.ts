@@ -26,7 +26,7 @@ export const useGetCaregiver = (caregiverId: string | undefined) => {
 
       try {
         const res = await api.get<CaregiverDetailResponse>(
-          `/member/caregiver/detail/${caregiverId}`
+          `/member/caregiver/detail/${caregiverId}`,
         );
 
         setData({

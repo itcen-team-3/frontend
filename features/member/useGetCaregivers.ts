@@ -22,7 +22,7 @@ export const useGetCaregivers = (searchName: string) => {
     try {
       const res = await api.get<CaregiverListResponse>(
         "/member/caregiver/list",
-        { query: searchName.length ? { searchName } : {} }
+        { query: searchName.length ? { searchName } : {} },
       );
       setData(res.data);
     } catch (e: any) {

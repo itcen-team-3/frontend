@@ -25,7 +25,7 @@ export const useGetWorkScheduleForPopup = (scheduleId: string | undefined) => {
 
       try {
         const res = await api.get<WorkScheduleItem>(
-          `/work-schedule/admin/day/${scheduleId}`
+          `/work-schedule/admin/day/${scheduleId}`,
         );
 
         setDataPopupData(res.data);

@@ -59,7 +59,7 @@ export function AttendanceForm({
   const [type, setType] = useState<"check-in" | "check-out">("check-in");
   const [patients, setPatients] = useState<Patient[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(
-    null
+    null,
   );
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -97,7 +97,7 @@ export function AttendanceForm({
       console.log("file", file);
       xhr.open(
         "POST",
-        `${process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8080/api/v1/"}attendance-explation`
+        `${process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8080/api/v1/"}attendance-explation`,
       );
       xhr.setRequestHeader("Content-Type", "application/json");
       xhr.setRequestHeader("Authorization", `Bearer ${token}`);
@@ -120,7 +120,7 @@ export function AttendanceForm({
             if (json.fieldErrors) {
               const errors: Record<string, string> = {};
               json.fieldErrors.forEach(
-                (e: any) => (errors[e.field] = e.message)
+                (e: any) => (errors[e.field] = e.message),
               );
               setFormErrors(errors);
             } else {
@@ -166,7 +166,7 @@ export function AttendanceForm({
                   variant="outline"
                   className={cn(
                     "w-full justify-start text-left text-lg font-normal h-14",
-                    !date && "text-muted-foreground"
+                    !date && "text-muted-foreground",
                   )}
                 >
                   <CalendarIcon className="mr-2 h-5 w-5" />

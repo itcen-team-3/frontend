@@ -56,7 +56,7 @@ export function CaregiverForm({
           career: "",
           profileImageFile: null,
         }
-      : initialData
+      : initialData,
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -65,7 +65,7 @@ export function CaregiverForm({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -218,7 +218,7 @@ export function CaregiverForm({
                   <AvatarImage
                     src={
                       formData?.profileImage ||
-                      "/placeholder.svg?height=128&width=128&query=person"
+                      "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
                     }
                     alt="프로필 이미지"
                   />
@@ -275,7 +275,7 @@ export function CaregiverForm({
                       className={cn(
                         "w-full justify-start text-left text-lg font-normal h-14",
                         !formData?.birthDate && "text-muted-foreground",
-                        errors.birthDate ? "border-red-500" : ""
+                        errors.birthDate ? "border-red-500" : "",
                       )}
                     >
                       <CalendarIcon className="mr-2 h-5 w-5" />

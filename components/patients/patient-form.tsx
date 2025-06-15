@@ -61,7 +61,7 @@ export function PatientForm({
           profileImage: "",
           patientLevel: "",
         }
-      : initialData
+      : initialData,
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -70,7 +70,7 @@ export function PatientForm({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -248,7 +248,7 @@ export function PatientForm({
                   <AvatarImage
                     src={
                       formData.profileImage ||
-                      "/placeholder.svg?height=128&width=128&query=elderly person"
+                      "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
                     }
                     alt="프로필 이미지"
                   />
@@ -305,7 +305,7 @@ export function PatientForm({
                       className={cn(
                         "w-full justify-start text-left font-normal text-lg h-14",
                         !formData.birthDate && "text-muted-foreground",
-                        errors.birthDate ? "border-red-500" : ""
+                        errors.birthDate ? "border-red-500" : "",
                       )}
                     >
                       <CalendarIcon className="mr-2 h-5 w-5" />

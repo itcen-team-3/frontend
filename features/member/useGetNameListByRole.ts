@@ -7,7 +7,7 @@ import { ErrorMessage } from "@/lib/types/api";
 
 export const useGetNameListByRole = (role: string) => {
   const [nameListByRole, setNameListByRole] = useState<RoleNameItem[] | null>(
-    null
+    null,
   );
   const [isNameListByRoleLoading, setNameListByRoleLoading] = useState(true);
   const [errorNameListByRole, setErrorNameListByRole] = useState<ErrorMessage>({
@@ -26,7 +26,7 @@ export const useGetNameListByRole = (role: string) => {
       try {
         const res = await api.get<RoleNameItem[]>(
           "/member/account/member-name-list",
-          { query: { role } }
+          { query: { role } },
         );
 
         setNameListByRole(res.data);

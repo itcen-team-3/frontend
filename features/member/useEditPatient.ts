@@ -17,7 +17,7 @@ export const useEditPatient = () => {
 
   const editPatient = async (
     patientId: string | undefined,
-    data: PatientInfoRequest
+    data: PatientInfoRequest,
   ) => {
     if (!patientId) return;
 

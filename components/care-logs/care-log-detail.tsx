@@ -54,7 +54,7 @@ export function CareLogDetail({
       acc[service.careItemType].push(service);
       return acc;
     },
-    {} as Record<string, CareItem[]>
+    {} as Record<string, CareItem[]>,
   );
 
   console.log("servicesByCategory", servicesByCategory);
@@ -62,7 +62,7 @@ export function CareLogDetail({
   // 총 소요 시간 계산
   const totalDuration = careDetailList.reduce(
     (sum, activity) => sum + Number(activity.requiredMinutes),
-    0
+    0,
   );
 
   // 시간을 시간:분 형식으로 변환
@@ -164,7 +164,7 @@ export function CareLogDetail({
                 servicesByCategory as Record<
                   string,
                   CaregiverCareLogActivityItem[]
-                >
+                >,
               ).map(([category, categoryActivities]) => {
                 return (
                   <div key={category}>
@@ -176,7 +176,7 @@ export function CareLogDetail({
                       {categoryActivities.map(
                         (
                           activity: CaregiverCareLogActivityItem,
-                          index: number
+                          index: number,
                         ) => (
                           <div
                             key={index}
@@ -194,7 +194,7 @@ export function CareLogDetail({
                               {activity.requiredMinutes}분
                             </span>
                           </div>
-                        )
+                        ),
                       )}
                     </div>
                   </div>
@@ -223,7 +223,10 @@ export function CareLogDetail({
                   <div key={`index_${index}`} className="space-y-3">
                     <div className="relative aspect-video rounded-lg overflow-hidden border">
                       <img
-                        src={photo.imageUrl || "/placeholder.svg"}
+                        src={
+                          photo.imageUrl ||
+                          "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+                        }
                         alt={`${photo.imageType === "MEAL" ? "식사" : "투약"} 사진`}
                         className="w-full h-full object-cover"
                       />

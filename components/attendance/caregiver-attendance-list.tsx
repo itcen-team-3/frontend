@@ -31,7 +31,7 @@ export function CaregiverAttendanceList() {
     const fetchData = async () => {
       try {
         const res = await api.get<{ attendances: AttendanceExplation[] }>(
-          "/attendance-explation/care-giver"
+          "/attendance-explation/care-giver",
         );
 
         console.log("응답 데이터:", res.data.attendances); // ← 추가
@@ -93,8 +93,8 @@ export function CaregiverAttendanceList() {
             ) : (
               Array.from(
                 new Map(
-                  data.map((item) => [item.attendanceExplationId, item])
-                ).values()
+                  data.map((item) => [item.attendanceExplationId, item]),
+                ).values(),
               ).map((item) => (
                 <div
                   key={item.attendanceExplationId}
@@ -109,7 +109,7 @@ export function CaregiverAttendanceList() {
                             "yyyy년 MM월 dd일",
                             {
                               locale: ko,
-                            }
+                            },
                           )}{" "}
                           {item.attendanceStatus} 소명
                         </h3>
@@ -124,7 +124,7 @@ export function CaregiverAttendanceList() {
                           제출:{" "}
                           {format(
                             new Date(item.submitDateTime),
-                            "yyyy-MM-dd HH:mm"
+                            "yyyy-MM-dd HH:mm",
                           )}
                         </div>
                       </div>

@@ -21,7 +21,7 @@ export function LoadingSpinner({
       className={cn(
         "animate-spin rounded-full border-2 border-gray-300 border-t-blue-600",
         sizeClasses[size],
-        className
+        className,
       )}
       role="status"
       aria-label="로딩 중"

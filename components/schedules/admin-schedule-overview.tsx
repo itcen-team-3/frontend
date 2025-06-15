@@ -44,7 +44,7 @@ export function AdminScheduleOverview({
 }: AdminScheduleOverviewProps) {
   const router = useRouter();
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(
-    startOfWeek(new Date(), { weekStartsOn: 1 })
+    startOfWeek(new Date(), { weekStartsOn: 1 }),
   );
 
   const [selectedEventDetails, setSelectedEventDetails] =
@@ -66,7 +66,7 @@ export function AdminScheduleOverview({
     (acc, event) => {
       const dateStr = format(
         !event.scheduleDate ? "" : event.scheduleDate,
-        "yyyy-MM-dd"
+        "yyyy-MM-dd",
       );
       if (!acc[dateStr]) {
         acc[dateStr] = [];
@@ -74,7 +74,7 @@ export function AdminScheduleOverview({
       acc[dateStr].push(event);
       return acc;
     },
-    {} as Record<string, WorkScheduleItem[]>
+    {} as Record<string, WorkScheduleItem[]>,
   );
 
   // 이전 주로 이동
@@ -105,7 +105,7 @@ export function AdminScheduleOverview({
     setSelectedDate(date);
 
     const { data }: { data: WorkScheduleItem } = await api.get(
-      `/work-schedule/admin/day/${event.scheduleId}`
+      `/work-schedule/admin/day/${event.scheduleId}`,
     );
 
     const workSchedule = {
@@ -139,7 +139,7 @@ export function AdminScheduleOverview({
               {format(
                 endOfWeek(currentWeekStart, { weekStartsOn: 1 }),
                 "MM월 dd일",
-                { locale: ko }
+                { locale: ko },
               )}
             </CardTitle>
             <Button variant="outline" size="icon" onClick={goToNextWeek}>
@@ -160,7 +160,7 @@ export function AdminScheduleOverview({
                 className={cn(
                   "py-2 font-medium text-center",
                   isToday(day) &&
-                    "bg-primary text-primary-foreground rounded-md"
+                    "bg-primary text-primary-foreground rounded-md",
                 )}
               >
                 {format(day, "eee", { locale: ko })}
@@ -189,7 +189,7 @@ export function AdminScheduleOverview({
                   const dayEvents = getEventsForDay(day).filter(
                     (event) =>
                       String(event.caregiverId) ===
-                      String(caregiver.caregiverId)
+                      String(caregiver.caregiverId),
                   );
                   return (
                     <div

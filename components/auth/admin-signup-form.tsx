@@ -18,7 +18,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EyeIcon, EyeOffIcon, Upload, AlertCircle, Check } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
 import Loading from "../ui/loading-page";
@@ -61,7 +60,7 @@ export function AdminSignupForm({
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registrationPreview, setRegistrationPreview] = useState<string | null>(
-    null
+    null,
   );
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
@@ -70,7 +69,7 @@ export function AdminSignupForm({
   }
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -248,15 +247,7 @@ export function AdminSignupForm({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="flex justify-center mb-6">
-            <Image
-              src="/nursing-home-logo.png"
-              alt="요양시설 로고"
-              width={120}
-              height={120}
-              className="rounded-full"
-            />
-          </div>
+          <div className="flex justify-center mb-6"></div>
 
           {errors.form && (
             <Alert variant="destructive">
@@ -540,7 +531,10 @@ export function AdminSignupForm({
                   <div className="space-y-4">
                     <div className="relative mx-auto max-w-md">
                       <img
-                        src={registrationPreview || "/placeholder.svg"}
+                        src={
+                          registrationPreview ||
+                          "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+                        }
                         alt="사업자등록증 미리보기"
                         className="max-h-48 mx-auto object-contain"
                       />

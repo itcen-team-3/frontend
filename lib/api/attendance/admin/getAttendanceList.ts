@@ -17,7 +17,7 @@ export interface attendanceItem {
 export async function getAttendanceList() {
   try {
     const res = await api.get<AdminAttendanceListResponse>(
-      "/attendance-explation/admin"
+      "/attendance-explation/admin",
     );
 
     if (!res || 400 < Number(res?.status)) {

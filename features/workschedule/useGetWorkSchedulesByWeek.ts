@@ -57,7 +57,7 @@ export const useGetWorkSchedulesByWeek = (startDate: string) => {
         setLoading(false);
       }
     },
-    [caregiverNameList?.caregivers]
+    [caregiverNameList?.caregivers],
   );
 
   useEffect(() => {

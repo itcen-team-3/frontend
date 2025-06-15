@@ -30,7 +30,7 @@ export const useSignUp = () => {
       formData.append("email", data.email);
       formData.append(
         "businessRegistrationNumber",
-        data.businessRegistrationNumber
+        data.businessRegistrationNumber,
       );
       // formData.append("openingDate", data.openingDate);
       formData.append("openingDate", "20121012");
@@ -39,7 +39,7 @@ export const useSignUp = () => {
       if (data.businessRegistrationFile) {
         formData.append(
           "businessRegistrationFile",
-          data.businessRegistrationFile
+          data.businessRegistrationFile,
         );
       }
 

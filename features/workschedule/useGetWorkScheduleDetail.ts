@@ -26,7 +26,7 @@ export const useGetWorkScheduleDetail = (scheduleId: string | undefined) => {
 
       try {
         const res = await api.get<WorkScheduleRequest>(
-          `/work-schedule/${scheduleId}`
+          `/work-schedule/${scheduleId}`,
         );
 
         setData({

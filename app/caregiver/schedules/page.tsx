@@ -9,7 +9,7 @@ import { startOfWeek } from "date-fns";
 export default function ScheduleCalendarPage() {
   const [date, setDate] = useState(new Date());
   const [startDateOfWeek, setDtartOfWeek] = useState(
-    startOfWeek(new Date(), { weekStartsOn: 1 })
+    startOfWeek(new Date(), { weekStartsOn: 1 }),
   );
 
   const { caregiverScheduleByDay, isCaregiverScheduleByDayLoading } =

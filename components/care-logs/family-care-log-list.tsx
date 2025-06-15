@@ -52,7 +52,8 @@ export function FamilyCareLogList({
       id: "1",
       date: new Date(2025, 4, 21), // 2025-05-21
       caregiverName: "김요양",
-      caregiverImage: "/diverse-woman-portrait.png",
+      caregiverImage:
+        "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
       startTime: "09:00",
       endTime: "12:00",
       activities: ["식사도움", "목욕도움", "말벗·격려 및 위로"],
@@ -64,7 +65,8 @@ export function FamilyCareLogList({
       id: "2",
       date: new Date(2025, 4, 20), // 2025-05-20
       caregiverName: "김요양",
-      caregiverImage: "/diverse-woman-portrait.png",
+      caregiverImage:
+        "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
       startTime: "09:00",
       endTime: "12:00",
       activities: ["식사도움", "청소 및 주변정돈", "외출 시 동행"],
@@ -76,7 +78,8 @@ export function FamilyCareLogList({
       id: "3",
       date: new Date(2025, 4, 19), // 2025-05-19
       caregiverName: "박요양",
-      caregiverImage: "/thoughtful-man.png",
+      caregiverImage:
+        "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
       startTime: "14:00",
       endTime: "17:00",
       activities: ["식사도움", "목욕도움", "인지자극활동"],
@@ -88,7 +91,8 @@ export function FamilyCareLogList({
       id: "4",
       date: new Date(2025, 4, 18), // 2025-05-18
       caregiverName: "김요양",
-      caregiverImage: "/diverse-woman-portrait.png",
+      caregiverImage:
+        "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
       startTime: "09:00",
       endTime: "12:00",
       activities: ["식사도움", "체위변경", "말벗·격려 및 위로", "생활상담"],
@@ -100,7 +104,8 @@ export function FamilyCareLogList({
       id: "5",
       date: new Date(2025, 4, 17), // 2025-05-17
       caregiverName: "박요양",
-      caregiverImage: "/thoughtful-man.png",
+      caregiverImage:
+        "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
       startTime: "14:00",
       endTime: "17:00",
       activities: ["식사도움", "청소 및 주변정돈"],
@@ -112,7 +117,8 @@ export function FamilyCareLogList({
       id: "6",
       date: new Date(), // 오늘
       caregiverName: "김요양",
-      caregiverImage: "/diverse-woman-portrait.png",
+      caregiverImage:
+        "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
       startTime: "09:00",
       endTime: "12:00",
       activities: ["식사도움", "목욕도움", "말벗·격려 및 위로"],
@@ -130,7 +136,7 @@ export function FamilyCareLogList({
 
   // 고유한 요양보호사 목록 추출
   const uniqueCaregivers = Array.from(
-    new Set(careLogs.map((log) => log.caregiverName))
+    new Set(careLogs.map((log) => log.caregiverName)),
   ).map((name) => {
     const caregiver = careLogs.find((log) => log.caregiverName === name);
     return {
@@ -184,7 +190,7 @@ export function FamilyCareLogList({
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left text-base md:text-lg font-normal h-12",
-                      !date && "text-muted-foreground"
+                      !date && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon className="mr-2 h-5 w-5" />
@@ -298,7 +304,7 @@ export function FamilyCareLogList({
                   <span className="font-medium text-sm md:text-base">
                     {
                       careLogs.filter(
-                        (log) => log.date.getMonth() === new Date().getMonth()
+                        (log) => log.date.getMonth() === new Date().getMonth(),
                       ).length
                     }
                     개
@@ -358,7 +364,10 @@ export function FamilyCareLogList({
                           <div className="flex items-center gap-2">
                             <Avatar className="h-8 w-8">
                               <AvatarImage
-                                src={log.caregiverImage || "/placeholder.svg"}
+                                src={
+                                  log.caregiverImage ||
+                                  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+                                }
                                 alt={log.caregiverName}
                               />
                               <AvatarFallback>

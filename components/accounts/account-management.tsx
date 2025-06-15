@@ -361,7 +361,7 @@ export function AccountManagement({
                       accounts.map((account) => (
                         <TableRow key={account.loginId}>
                           <TableCell className="text-base font-medium">
-                            {account.name}
+                            {account.loginId}
                           </TableCell>
                           <TableCell className="text-base">
                             {account.name}
