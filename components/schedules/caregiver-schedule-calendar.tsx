@@ -25,9 +25,7 @@ interface CaregiverScheduleCalendarProps {
   setDate: (args: Date) => void;
   caregiverScheduleByDay: WorkScheduleItem[];
   isCaregiverScheduleByDayLoading: boolean;
-  setDtartOfWeek: (args: Date) => void;
   caregiverScheduleByWeek: WorkScheduleItem[];
-  isCaregiverScheduleByWeekLoading: boolean;
 }
 
 export function CaregiverScheduleCalendar({
@@ -35,13 +33,11 @@ export function CaregiverScheduleCalendar({
   caregiverScheduleByDay,
   setDate,
   isCaregiverScheduleByDayLoading,
-  setDtartOfWeek,
   caregiverScheduleByWeek,
-  isCaregiverScheduleByWeekLoading,
 }: CaregiverScheduleCalendarProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(date);
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(
-    startOfWeek(new Date(), { weekStartsOn: 1 }),
+    startOfWeek(new Date(), { weekStartsOn: 1 })
   );
   const [activeView, setActiveView] = useState<string>("month");
 
@@ -199,7 +195,7 @@ export function CaregiverScheduleCalendar({
                   {format(
                     endOfWeek(currentWeekStart, { weekStartsOn: 1 }),
                     "MM월 dd일",
-                    { locale: ko },
+                    { locale: ko }
                   )}
                 </CardTitle>
                 <Button variant="outline" size="icon" onClick={goToNextWeek}>
@@ -215,7 +211,7 @@ export function CaregiverScheduleCalendar({
                     className="text-center"
                     onClick={() => {
                       setSelectedDate(day);
-                      setDtartOfWeek(day);
+                      setDate(day);
                     }}
                   >
                     <div
@@ -224,7 +220,7 @@ export function CaregiverScheduleCalendar({
                         isSameDay(day, selectedDate) && "bg-black text-white",
                         !isSameDay(day, selectedDate) ||
                           (isSameDay(day, new Date()) &&
-                            "bg-primary text-primary-foreground"),
+                            "bg-primary text-primary-foreground")
                       )}
                     >
                       {format(day, "eee", { locale: ko })}
@@ -243,7 +239,7 @@ export function CaregiverScheduleCalendar({
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {isCaregiverScheduleByWeekLoading ? (
+                  {isCaregiverScheduleByDayLoading ? (
                     <Loader2 />
                   ) : (
                     caregiverScheduleByWeek.map((event, index) => (
