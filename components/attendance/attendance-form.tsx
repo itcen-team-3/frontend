@@ -62,6 +62,7 @@ export function AttendanceForm({
     null
   );
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const { showAlert } = useModal();
 
@@ -159,8 +160,7 @@ export function AttendanceForm({
           {/* 날짜 선택 */}
           <div className="space-y-2">
             <Label className="text-lg">날짜</Label>
-            <Label className="text-lg">날짜</Label>
-            <Popover>
+            <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -179,9 +179,46 @@ export function AttendanceForm({
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={setDate}
-                  initialFocus
+                  onSelect={(value) => {
+                    if (value) {
+                      setDate(value);
+                      setIsCalendarOpen(false);
+                    }
+                  }}
                   required
+                  classNames={{
+                    months:
+                      "relative flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+                    month: "space-y-4",
+                    caption: "flex justify-between items-center px-2 py-2",
+                    caption_label: "text-lg font-semibold",
+                    month_caption: "flex justify-center",
+                    month_grid: "w-full",
+                    nav: "absolute top-1/15 left-0 right-0 flex justify-between -translate-y-1/2 mr-0",
+                    nav_button:
+                      "h-7 w-7 bg-transparent p-0 opacity-70 hover:opacity-100",
+                    head_row: "flex",
+                    head_cell:
+                      "text-gray-500 rounded-md w-9 font-normal text-[0.8rem]",
+                    row: "flex w-full mt-2",
+                    cell: "text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-range-start)]:rounded-l-md focus-within:relative focus-within:z-20",
+                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+                    selected:
+                      "h-8 w-9 rounded-full bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                    day_today: "bg-accent text-accent-foreground",
+                    day_button: "w-full flex justify-center items-center",
+                    day_outside: "opacity-50",
+                    day_disabled: "opacity-50",
+                    day_range_middle:
+                      "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                    day_hidden: "invisible",
+                  }}
+                  modifiersStyles={{
+                    hasEvent: {
+                      backgroundColor: "rgba(59, 130, 246, 0.1)",
+                      fontWeight: "bold",
+                    },
+                  }}
                 />
               </PopoverContent>
             </Popover>
