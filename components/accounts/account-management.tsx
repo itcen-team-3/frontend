@@ -141,7 +141,6 @@ export function AccountManagement({
   };
 
   const handleEditClick = (account: AccountItem) => {
-    console.log("이거 뭔데 ??", account);
     setEditAccount({
       memberId: account.memberId,
       loginNewId: account.loginId,
