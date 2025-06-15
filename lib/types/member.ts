@@ -212,17 +212,13 @@ interface IdRequest {
   loginNewId: string;
 }
 
-interface CaregiverDashboardScheduleItem {
-  patientId: string;
+interface CaregiverDashboardInfoResponse {
+  caregiverName: string;
+  patientId: number;
   patientName: string;
   startTime: string;
   endTime: string;
-  attendanceStatus: string;
-}
-
-interface CaregiverDashboardInfoResponse {
-  caregiverName: string;
-  schedules: CaregiverDashboardScheduleItem[];
+  workStatus: boolean;
 }
 
 export {
@@ -252,6 +248,5 @@ export {
   type RoleNameItem,
   type PasswordRequest,
   type IdRequest,
-  type CaregiverDashboardScheduleItem,
   type CaregiverDashboardInfoResponse,
 };

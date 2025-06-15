@@ -73,7 +73,7 @@ export function CareLogCreateForm({
       acc[service.type].push(service);
       return acc;
     },
-    {} as Record<string, CareItem[]>,
+    {} as Record<string, CareItem[]>
   );
 
   // 서비스 선택/해제
@@ -140,15 +140,13 @@ export function CareLogCreateForm({
   // 사진 타입 변경
   const handlePhotoTypeChange = (id: string, type: string) => {
     setPhotos((prev) =>
-      prev.map((photo) => (photo.id === id ? { ...photo, type } : photo)),
+      prev.map((photo) => (photo.id === id ? { ...photo, type } : photo))
     );
   };
 
   // 서명 관련 함수들
   const startDrawing = (
-    e:
-      | React.MouseEvent<HTMLCanvasElement>
-      | React.TouchEvent<HTMLCanvasElement>,
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -175,9 +173,7 @@ export function CareLogCreateForm({
   };
 
   const draw = (
-    e:
-      | React.MouseEvent<HTMLCanvasElement>
-      | React.TouchEvent<HTMLCanvasElement>,
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ) => {
     if (!isDrawing) return;
 
@@ -206,9 +202,7 @@ export function CareLogCreateForm({
   };
 
   const isTouchEvent = (
-    e:
-      | React.MouseEvent<HTMLCanvasElement>
-      | React.TouchEvent<HTMLCanvasElement>,
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ): e is React.TouchEvent<HTMLCanvasElement> => {
     return "touches" in e;
   };
@@ -248,7 +242,7 @@ export function CareLogCreateForm({
 
     // 선택된 서비스의 소요시간 체크
     const missingDurations = selectedServices.filter(
-      (code) => !durations[code] || durations[code] === "",
+      (code) => !durations[code] || durations[code] === ""
     );
     if (missingDurations.length > 0) {
       showAlert({
@@ -376,7 +370,7 @@ export function CareLogCreateForm({
                                 onChange={(e) =>
                                   handleDurationChange(
                                     service.id,
-                                    e.target.value,
+                                    e.target.value
                                   )
                                 }
                                 className="w-24 text-lg"

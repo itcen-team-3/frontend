@@ -6,7 +6,6 @@ import { useCreateWorkStart } from "@/features/workschedule/useCreateWorkStart";
 import Loading from "@/components/ui/loading-page";
 import { useCreateWorkEnd } from "@/features/workschedule/useCreateWorkEnd";
 import { useGetDashboardInfo } from "@/features/member/useGetCaregiverDashboardInfo";
-import { findClosestOrActiveTime } from "@/lib/utils";
 
 export default function DashboardPage() {
   const params = useParams();
@@ -22,19 +21,13 @@ export default function DashboardPage() {
     return <Loading />;
   }
 
-  const schedule = findClosestOrActiveTime(
-    new Date(),
-    dashboardInfo?.schedules || [],
-  );
-
   return (
     <CaregiverDashboard
       caregiverName={dashboardInfo?.caregiverName || ""}
-      patientName={schedule?.patientName || ""}
-      workingHours={schedule?.startTime + "부터 " + schedule?.endTime}
-      isWorkingDay={schedule ? true : false}
-      attendanceStatus={schedule?.attendanceStatus || ""}
-      patientId={schedule?.patientId || ""}
+      patientName={dashboardInfo?.patientName || ""}
+      workingHours={dashboardInfo?.startTime + "부터 " + dashboardInfo?.endTime}
+      isWorkingDay={dashboardInfo?.workStatus ? true : false}
+      patientId={String(dashboardInfo?.patientId) || ""}
       uuid={uuid}
       createWorkStart={createWorkStart}
       createWorkEnd={createWorkEnd}

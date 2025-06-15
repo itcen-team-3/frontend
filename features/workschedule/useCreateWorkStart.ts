@@ -21,6 +21,7 @@ export const useCreateWorkStart = () => {
 
       if (res.code < 300) {
         console.log("출근 체크 성공");
+        // TODO 수정 필요
         localStorage.setItem("check-in", "1");
         router.push("/caregiver/dashboard");
       }
