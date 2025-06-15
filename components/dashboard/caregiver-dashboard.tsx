@@ -23,7 +23,6 @@ interface CaregiverDashboardProps {
   patientName: string | null;
   workingHours: string | null;
   isWorkingDay: boolean;
-  attendanceStatus: string;
   patientId: string;
   uuid?: string;
   createWorkStart: (uuid: string) => void;
@@ -35,7 +34,6 @@ export function CaregiverDashboard({
   patientName,
   workingHours,
   isWorkingDay,
-  attendanceStatus,
   patientId,
   uuid = "",
   createWorkStart,
@@ -96,7 +94,7 @@ export function CaregiverDashboard({
             <div className="grid grid-cols-2 gap-4">
               <LargeButton
                 className="bg-green-600 hover:bg-green-700 text-white"
-                disabled={isCheckedIn || attendanceStatus === "출근"}
+                disabled={isCheckedIn}
                 onClick={onClickStartWorkButton}
               >
                 <Clock className="mr-2 h-6 w-6" />
