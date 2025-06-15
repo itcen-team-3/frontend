@@ -48,7 +48,7 @@ export function FamilyCareLogDetail({
   // id = "1",
   patientName = "이환자",
   caregiverName = "김요양",
-  caregiverImage = "/diverse-woman-portrait.png",
+  caregiverImage = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
   caregiverPhone = "010-1234-5678",
   date = "2025-05-21",
   startTime = "09:00",
@@ -71,8 +71,16 @@ export function FamilyCareLogDetail({
   ],
   notes = "오늘은 식사를 잘 하셨습니다. 목욕 후 기분이 좋아지신 것 같습니다. 평소보다 기분이 밝으셔서 대화도 많이 나누었습니다. 혈압은 120/80으로 안정적이었습니다.",
   photos = [
-    { id: "1", type: "식사", url: "/placeholder.svg?height=200&width=300" },
-    { id: "2", type: "투약", url: "/placeholder.svg?height=200&width=300" },
+    {
+      id: "1",
+      type: "식사",
+      url: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
+    },
+    {
+      id: "2",
+      type: "투약",
+      url: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
+    },
   ],
   signature = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
 }: FamilyCareLogDetailProps) {
@@ -137,7 +145,10 @@ export function FamilyCareLogDetail({
             <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16">
                 <AvatarImage
-                  src={caregiverImage || "/placeholder.svg"}
+                  src={
+                    caregiverImage ||
+                    "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+                  }
                   alt={caregiverName}
                 />
                 <AvatarFallback className="text-2xl">
@@ -229,7 +240,10 @@ export function FamilyCareLogDetail({
                   <div key={photo.id} className="space-y-3">
                     <div className="relative aspect-video rounded-lg overflow-hidden border">
                       <img
-                        src={photo.url || "/placeholder.svg"}
+                        src={
+                          photo.url ||
+                          "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+                        }
                         alt={`${photo.type} 사진`}
                         className="w-full h-full object-cover"
                       />
@@ -271,7 +285,10 @@ export function FamilyCareLogDetail({
               <div className="flex justify-center p-6 border rounded-lg bg-muted/30">
                 <div className="max-w-md">
                   <img
-                    src={signature || "/placeholder.svg"}
+                    src={
+                      signature ||
+                      "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+                    }
                     alt="요양보호사 서명"
                     className="max-h-32 w-auto border rounded"
                   />

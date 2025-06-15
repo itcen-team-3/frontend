@@ -48,7 +48,7 @@ export function PatientList({
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(
-    null
+    null,
   );
 
   if (isLoading) {
@@ -116,7 +116,10 @@ export function PatientList({
                     <Avatar>
                       {/* TODO : patient.imageUrl 추가 */}
                       <AvatarImage
-                        src={"/placeholder.svg"}
+                        src={
+                          patient.profileImage ||
+                          "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+                        }
                         alt={patient.name}
                       />
                       <AvatarFallback>{patient.name[0]}</AvatarFallback>

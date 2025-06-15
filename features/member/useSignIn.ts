@@ -16,7 +16,7 @@ export const useSignIn = () => {
 
   const signIn = async (
     body: SignInRequest,
-    type: "admin" | "caregiver" | "family"
+    type: "admin" | "caregiver" | "family",
   ) => {
     setLoading(true);
     setError({
@@ -27,7 +27,7 @@ export const useSignIn = () => {
     try {
       const res = await api.post<SignInResponse, SignInRequest>(
         "/admin/login",
-        { body }
+        { body },
       );
 
       console.log("sign-in res", res);

@@ -29,7 +29,7 @@ export const useCreateAccount = () => {
             loginId: data.id,
             loginPw: data.password,
           },
-        }
+        },
       );
 
       if (res.code < 300) {

@@ -41,7 +41,10 @@ export function PatientDetail({ data }: PatientDetailProps) {
           <CardContent className="flex flex-col items-center text-center">
             <Avatar className="w-32 h-32 mb-4">
               <AvatarImage
-                src={data.profileImage || "/placeholder.svg"}
+                src={
+                  data.profileImage ||
+                  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+                }
                 alt={data.name}
               />
               <AvatarFallback className="text-4xl">

@@ -269,7 +269,7 @@ export function ScheduleForm({
                       variant="outline"
                       className={cn(
                         "w-full justify-start text-left text-lg font-normal h-14",
-                        !formData.startDate && "text-muted-foreground"
+                        !formData.startDate && "text-muted-foreground",
                       )}
                     >
                       <CalendarIcon className="mr-2 h-5 w-5" />
@@ -327,7 +327,7 @@ export function ScheduleForm({
                       variant="outline"
                       className={cn(
                         "w-full justify-start text-left text-lg font-normal h-14",
-                        !formData.endDate && "text-muted-foreground"
+                        !formData.endDate && "text-muted-foreground",
                       )}
                     >
                       <CalendarIcon className="mr-2 h-5 w-5" />

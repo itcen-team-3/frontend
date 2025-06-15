@@ -20,7 +20,7 @@ export default function DashboardPage() {
 
   const schedule = findClosestOrActiveTime(
     new Date(),
-    dashboardInfo?.schedules || []
+    dashboardInfo?.schedules || [],
   );
 
   return (

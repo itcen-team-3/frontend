@@ -105,15 +105,7 @@ export function LoginForm({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="flex justify-center">
-          {/* <Image
-            src="/nursing-home-logo.png"
-            alt="요양시설 로고"
-            width={120}
-            height={120}
-            className="rounded-full"
-          /> */}
-        </div>
+        <div className="flex justify-center"></div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="username" className="text-lg">

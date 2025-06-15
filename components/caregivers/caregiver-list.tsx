@@ -50,7 +50,7 @@ export function CaregiverList({
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedCaregiverId, setSelectedCaregiverId] = useState<number | null>(
-    null
+    null,
   );
 
   if (isLoading) {
@@ -118,7 +118,10 @@ export function CaregiverList({
                     <Avatar>
                       {/* TODO : caregiver.imageUrl 추가 */}
                       <AvatarImage
-                        src={"/placeholder.svg"}
+                        src={
+                          caregiver.profileImage ||
+                          "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+                        }
                         alt={caregiver.name}
                       />
                       <AvatarFallback>{caregiver.name[0]}</AvatarFallback>

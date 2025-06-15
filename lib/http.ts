@@ -53,7 +53,7 @@ function buildUrl(path: string, query?: HttpOptions["query"]) {
 export async function http<T = unknown, B = unknown>(
   method: HttpMethod,
   path: string,
-  { query, body, config }: HttpOptions<B> = {}
+  { query, body, config }: HttpOptions<B> = {},
 ): Promise<ApiResponse<T>> {
   const accessToken = localStorage.getItem("access-token");
 
@@ -80,7 +80,7 @@ export async function http<T = unknown, B = unknown>(
 export async function http_form<T = unknown>(
   method: HttpMethod,
   path: string,
-  { query, body, config }: HttpFormOptions = {}
+  { query, body, config }: HttpFormOptions = {},
 ): Promise<ApiResponse<T>> {
   const accessToken = localStorage.getItem("access-token");
 

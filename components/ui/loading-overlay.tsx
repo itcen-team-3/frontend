@@ -19,7 +19,7 @@ export function LoadingOverlay({
       className={cn(
         "fixed inset-0 z-50 flex items-center justify-center",
         transparent ? "bg-black/20" : "bg-white/80 backdrop-blur-sm",
-        className
+        className,
       )}
       role="dialog"
       aria-modal="true"

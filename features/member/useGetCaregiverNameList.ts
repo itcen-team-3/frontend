@@ -26,7 +26,7 @@ export const useGetCaregiverNameList = () => {
 
       try {
         const res = await api.get<CaregiverNameListResponse>(
-          "/member/caregiver-name-list"
+          "/member/caregiver-name-list",
         );
         setCaregiverNameList(res.data);
       } catch (e: any) {

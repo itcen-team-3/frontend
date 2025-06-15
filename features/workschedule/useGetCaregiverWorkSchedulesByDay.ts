@@ -29,7 +29,7 @@ export const useGetCaregiverWorkSchedulesByDay = (date: Date | undefined) => {
 
       try {
         const res = await api.get<CaregiverWorkSchedulesByDayResponse>(
-          `/work-schedule/care-giver/day/${format(date, "yyyy-MM-dd")}`
+          `/work-schedule/care-giver/day/${format(date, "yyyy-MM-dd")}`,
         );
 
         setCaregiverScheduleByDay({

@@ -26,7 +26,7 @@ export const useGetPatientNameList = () => {
 
       try {
         const res = await api.get<PatientNameListResponse>(
-          "/member/patient-name-list"
+          "/member/patient-name-list",
         );
         setPatientNameList(res.data);
       } catch (e: any) {

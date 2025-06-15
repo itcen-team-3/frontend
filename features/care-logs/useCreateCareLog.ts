@@ -27,7 +27,7 @@ export const useCreateCareLog = () => {
         formData.append(`careItemList[${i}].careItemId`, keys[i]);
         formData.append(
           `careItemList[${i}].requiredMinutes`,
-          data.durations[`${keys[i]}`]
+          data.durations[`${keys[i]}`],
         );
       }
 
@@ -35,7 +35,7 @@ export const useCreateCareLog = () => {
         if (photo.file) {
           formData.append(
             `imageDtoList[${index}].imageType`,
-            photo.type === "식사" ? "MEAL" : "MEDICATION"
+            photo.type === "식사" ? "MEAL" : "MEDICATION",
           );
           formData.append(`imageDtoList[${index}].imageFile`, photo.file);
         }

@@ -26,7 +26,7 @@ export const useGetPatientForUpdate = (patientId: string | undefined) => {
 
       try {
         const res = await api.get<PatientInfoRequest>(
-          `/member/patient/${patientId}`
+          `/member/patient/${patientId}`,
         );
         setData({
           ...res.data,

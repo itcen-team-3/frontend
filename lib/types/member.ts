@@ -59,6 +59,7 @@ interface CaregiverListItem {
   caregiverId: number;
   name: string;
   phoneNumber: string;
+  profileImage?: string;
 }
 
 interface CaregiverListResponse {
@@ -112,6 +113,7 @@ interface PatientListItem {
   patientId: number;
   name: string;
   age: number;
+  profileImage?: string;
 }
 
 interface PatientListResponse {

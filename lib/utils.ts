@@ -53,12 +53,12 @@ export function buildDateFromTimeString(timeStr: string): Date {
     now.getDate(),
     hour,
     minute,
-    second
+    second,
   );
 }
 
 function getDashBoardForm(
-  item: CaregiverDashboardScheduleItem
+  item: CaregiverDashboardScheduleItem,
 ): CaregiverDashboardScheduleItem {
   const [hourStart, minuteStart] = item.startTime.split(":");
   const hour_s = parseInt(hourStart, 10);
@@ -80,7 +80,7 @@ function getDashBoardForm(
  */
 export function findClosestOrActiveTime(
   currentTime: Date,
-  items: CaregiverDashboardScheduleItem[]
+  items: CaregiverDashboardScheduleItem[],
 ): CaregiverDashboardScheduleItem | null {
   if (items.length === 0) return null;
 
@@ -88,7 +88,7 @@ export function findClosestOrActiveTime(
   const activeItem = items.find(
     (item) =>
       currentTime >= buildDateFromTimeString(item.startTime) &&
-      currentTime <= buildDateFromTimeString(item.endTime)
+      currentTime <= buildDateFromTimeString(item.endTime),
   );
 
   if (activeItem) {
@@ -101,7 +101,7 @@ export function findClosestOrActiveTime(
 
   for (const item of items) {
     const diff = Math.abs(
-      buildDateFromTimeString(item.startTime).getTime() - currentTime.getTime()
+      buildDateFromTimeString(item.startTime).getTime() - currentTime.getTime(),
     );
     if (diff < closestDiff) {
       closestDiff = diff;

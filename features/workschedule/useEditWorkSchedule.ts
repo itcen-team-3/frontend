@@ -17,7 +17,7 @@ export const useEditWorkSchedule = () => {
 
   const editWorkSchedule = async (
     scheduleId: string | undefined,
-    data: WorkScheduleRequest
+    data: WorkScheduleRequest,
   ) => {
     if (!scheduleId) return;
 

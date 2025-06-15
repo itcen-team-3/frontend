@@ -17,7 +17,7 @@ export const useEditCaregiver = () => {
 
   const editCaregiver = async (
     caregiverId: string | undefined,
-    data: CaregiverInfoRequest
+    data: CaregiverInfoRequest,
   ) => {
     if (!caregiverId) return;
 
