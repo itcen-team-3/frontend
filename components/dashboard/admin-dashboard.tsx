@@ -61,6 +61,7 @@ export function AdminDashboard({
     },
   ],
 }: AdminDashboardProps) {
+  console.log(adminName);
   const [date, setDate] = React.useState<Date | undefined>(new Date());
 
   const statusMap = {
