@@ -44,12 +44,20 @@ export function FamilyDashboard() {
   const [careLogs, setCareLogs] = useState<CareLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [caregiverName, setCaregiverName] = useState("");
-  const [caregiverStatus, setCaregiverStatus] = useState<"working" | "scheduled" | "off">("off");
+  const [caregiverStatus, setCaregiverStatus] = useState<
+    "working" | "scheduled" | "off"
+  >("off");
   const [profileImageUrl, setProfileImageUrl] = useState("");
   const [selectedLog, setSelectedLog] = useState<CareLogDetail | null>(null);
   const [open, setOpen] = useState(false);
 
-  const statusMap: Record<"working" | "scheduled" | "off", { label: string; status: StatusType }> = {
+  console.log("selectedLog", selectedLog);
+  console.log("open", open);
+
+  const statusMap: Record<
+    "working" | "scheduled" | "off",
+    { label: string; status: StatusType }
+  > = {
     working: { label: "근무 중", status: "success" },
     scheduled: { label: "예정됨", status: "info" },
     off: { label: "근무 없음", status: "default" },
@@ -89,12 +97,13 @@ export function FamilyDashboard() {
           setProfileImageUrl(caregiver.profileImageUrl);
         }
 
-        const logs: CareLog[] = dashboard.careLogList?.map((log: any) => ({
-          careLogId: log.careLogId,
-          createDate: log.createDate,
-          careGiverName: log.careGiverName,
-          activeCount: log.activeCount,
-        })) || [];
+        const logs: CareLog[] =
+          dashboard.careLogList?.map((log: any) => ({
+            careLogId: log.careLogId,
+            createDate: log.createDate,
+            careGiverName: log.careGiverName,
+            activeCount: log.activeCount,
+          })) || [];
 
         setCareLogs(logs);
       } catch (error) {
@@ -119,7 +128,10 @@ export function FamilyDashboard() {
 
   return (
     <PageContainer>
-      <PageHeader title="가족님, 안녕하세요" description="최근 돌봄 현황을 확인하세요." />
+      <PageHeader
+        title="가족님, 안녕하세요"
+        description="최근 돌봄 현황을 확인하세요."
+      />
 
       <div className="grid gap-6">
         <Card className="card-shadow">
@@ -212,7 +224,9 @@ export function FamilyDashboard() {
                 {loading ? (
                   <p className="text-muted-foreground">로딩 중...</p>
                 ) : careLogs.length === 0 ? (
-                  <p className="text-muted-foreground">작성된 돌봄일지가 없습니다.</p>
+                  <p className="text-muted-foreground">
+                    작성된 돌봄일지가 없습니다.
+                  </p>
                 ) : (
                   careLogs.map((log) => (
                     <div key={log.careLogId} className="p-4 border rounded-lg">
