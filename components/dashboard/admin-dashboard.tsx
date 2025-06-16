@@ -73,7 +73,7 @@ export function AdminDashboard({
   return (
     <PageContainer>
       <PageHeader
-        title={`${adminName}님, 안녕하세요`}
+        title={`관리자님, 안녕하세요`}
         description="오늘의 스케줄과 알림을 확인하세요"
       />
 

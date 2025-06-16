@@ -60,7 +60,7 @@ export function AdminSignupForm({
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registrationPreview, setRegistrationPreview] = useState<string | null>(
-    null,
+    null
   );
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
@@ -69,7 +69,7 @@ export function AdminSignupForm({
   }
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -607,7 +607,10 @@ export function AdminSignupForm({
       <CardFooter className="flex flex-col space-y-2 text-center">
         <p className="text-sm text-muted-foreground">
           이미 계정이 있으신가요?{" "}
-          <Link href="/admin/login" className="text-primary hover:underline">
+          <Link
+            href="/admin/schedules"
+            className="text-primary hover:underline"
+          >
             로그인하기
           </Link>
         </p>
