@@ -30,6 +30,8 @@ import { CaregiverNameListItem } from "@/lib/types/member";
 import { WorkScheduleItem } from "@/lib/types/workSchedule";
 import { api } from "@/lib/http";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 
 interface AdminScheduleOverviewProps {
   scheduleEvents: WorkScheduleItem[];
@@ -44,7 +46,7 @@ export function AdminScheduleOverview({
 }: AdminScheduleOverviewProps) {
   const router = useRouter();
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(
-    startOfWeek(new Date(), { weekStartsOn: 1 }),
+    startOfWeek(new Date(), { weekStartsOn: 1 })
   );
 
   const [selectedEventDetails, setSelectedEventDetails] =
@@ -66,7 +68,7 @@ export function AdminScheduleOverview({
     (acc, event) => {
       const dateStr = format(
         !event.scheduleDate ? "" : event.scheduleDate,
-        "yyyy-MM-dd",
+        "yyyy-MM-dd"
       );
       if (!acc[dateStr]) {
         acc[dateStr] = [];
@@ -74,7 +76,7 @@ export function AdminScheduleOverview({
       acc[dateStr].push(event);
       return acc;
     },
-    {} as Record<string, WorkScheduleItem[]>,
+    {} as Record<string, WorkScheduleItem[]>
   );
 
   // 이전 주로 이동
@@ -105,7 +107,7 @@ export function AdminScheduleOverview({
     setSelectedDate(date);
 
     const { data }: { data: WorkScheduleItem } = await api.get(
-      `/work-schedule/admin/day/${event.scheduleId}`,
+      `/work-schedule/admin/day/${event.scheduleId}`
     );
 
     const workSchedule = {
@@ -123,10 +125,17 @@ export function AdminScheduleOverview({
 
   return (
     <PageContainer>
-      <PageHeader
-        title="스케줄 관리 대시보드"
-        description="모든 요양보호사의 스케줄을 한눈에 확인하세요"
-      />
+      <div className="flex justify-between items-center">
+        <PageHeader
+          title="스케줄 관리 대시보드"
+          description="모든 요양보호사의 스케줄을 한눈에 확인하세요"
+        />
+        <Link href="/admin/schedules/new">
+          <Button size="lg" className="text-lg">
+            <Plus className="mr-2 h-5 w-5" />새 스케줄
+          </Button>
+        </Link>
+      </div>
 
       <Card className="card-shadow">
         <CardHeader>
@@ -139,7 +148,7 @@ export function AdminScheduleOverview({
               {format(
                 endOfWeek(currentWeekStart, { weekStartsOn: 1 }),
                 "MM월 dd일",
-                { locale: ko },
+                { locale: ko }
               )}
             </CardTitle>
             <Button variant="outline" size="icon" onClick={goToNextWeek}>
@@ -160,7 +169,7 @@ export function AdminScheduleOverview({
                 className={cn(
                   "py-2 font-medium text-center",
                   isToday(day) &&
-                    "bg-primary text-primary-foreground rounded-md",
+                    "bg-primary text-primary-foreground rounded-md"
                 )}
               >
                 {format(day, "eee", { locale: ko })}
@@ -189,7 +198,7 @@ export function AdminScheduleOverview({
                   const dayEvents = getEventsForDay(day).filter(
                     (event) =>
                       String(event.caregiverId) ===
-                      String(caregiver.caregiverId),
+                      String(caregiver.caregiverId)
                   );
                   return (
                     <div
